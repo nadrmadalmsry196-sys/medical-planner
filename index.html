@@ -41,7 +41,6 @@
         h1 { margin: 0 0 5px 0; font-size: 22px; }
         .subtitle { font-size: 12px; opacity: 0.9; }
 
-        /* زر تبديل الوضع الليلي */
         .theme-toggle {
             position: absolute;
             left: 20px;
@@ -57,7 +56,6 @@
         }
         .theme-toggle:hover { background: rgba(255,255,255,0.3); }
 
-        /* الحاوية الكبرى المتفرعة للأقسام */
         .master-card {
             background: var(--card-bg);
             border-radius: 0 0 16px 16px;
@@ -68,7 +66,6 @@
             margin-bottom: 20px;
         }
 
-        /* شريط التبويبات */
         .tabs { display: flex; background: #caf0f8; padding: 10px 10px 0 10px; gap: 6px; border-bottom: 2px solid #bde0fe; flex-wrap: wrap; }
         [data-theme="dark"] .tabs { background: #1e293b; border-color: #334155; }
         .tab-btn { background: #ade8f4; border: none; padding: 10px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; font-size: 12px; color: var(--primary); transition: all 0.3s; }
@@ -86,15 +83,12 @@
         button.action-btn { background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 15px; font-weight: bold; margin-top: 5px; transition: background 0.3s; }
         button.action-btn:hover { background: var(--primary); }
 
-        /* شريط التقدم البصري */
         .progress-container { margin-top: 15px; background: #e2e8f0; border-radius: 10px; height: 16px; overflow: hidden; position: relative; }
         .progress-bar { background: var(--medical-teal); height: 100%; width: 0%; transition: width 0.4s; text-align: center; color: white; font-size: 10px; font-weight: bold; line-height: 16px; }
 
-        /* بطاقات الذاكرة السريعة Flashcards */
         .flashcard { background: #f8fafc; border: 2px solid var(--secondary); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; margin-top: 15px; min-height: 80px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); font-size: 14px; }
         [data-theme="dark"] .flashcard { background: #334155; color: #38bdf8; }
 
-        /* جدول النتائج */
         .schedule-table { width: 100%; border-collapse: collapse; font-size: 13px; border-radius: 8px; overflow: hidden; margin-top: 15px; }
         .schedule-table th { background-color: var(--primary); color: white; padding: 12px; text-align: center; }
         .schedule-table td { background-color: var(--table-bg); padding: 12px; text-align: center; border-bottom: 1px solid #cbd5e1; color: var(--text); font-weight: 500; }
@@ -123,7 +117,7 @@
                 <button class="tab-btn" onclick="switchTab(event, 'aiSection')">🤖 المساعد الذكي</button>
             </div>
 
-            <!-- 1. قسم تخطيط الوقت -->
+            <!-- 1. تخطيط الوقت -->
             <div id="plannerSection" class="section-content active">
                 <h3>📊 جدول تنظيم الوقت والمحاضرات الطبية</h3>
                 <div class="form-group">
@@ -162,7 +156,7 @@
                 </div>
             </div>
 
-            <!-- 2. قسم تتبع التقدم -->
+            <!-- 2. تتبع التقدم -->
             <div id="progressSection" class="section-content">
                 <h3>📈 شريط تتبع إنجاز المادة</h3>
                 <div class="form-group">
@@ -173,10 +167,10 @@
                 <div class="progress-container">
                     <div id="progressBar" class="progress-bar">0%</div>
                 </div>
-                <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا بطل! الانتظام اليومي هو سر التفوق الطبي.</div>
+                <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا دكتور المستقبل! الانتظام اليومي هو سر التفوق الطبي.</div>
             </div>
 
-            <!-- 3. قسم اختبارات الملفات -->
+            <!-- 3. اختبارات الملفات -->
             <div id="quizSection" class="section-content">
                 <h3>📝 اختبار قياس الفهم وتحصيل العلامات من الملفات</h3>
                 <div class="file-upload-box">
@@ -194,7 +188,7 @@
                 <div class="result-box" id="quizRes" style="display: none;"></div>
             </div>
 
-            <!-- 4. قسم فلاش كاردز (بطاقات الذاكرة) -->
+            <!-- 4. فلاش كاردز -->
             <div id="flashcardSection" class="section-content">
                 <h3>⚡ بطاقات الذاكرة السريعة (High-Yield Flashcards)</h3>
                 <p style="font-size: 12px; opacity: 0.8;">اضغط على البطاقة لقلبها ومعرفة الإجابة الطبية السريعة:</p>
@@ -204,12 +198,12 @@
                 <button class="action-btn" style="margin-top: 15px;" onclick="nextCard()">بطاقة أخرى ➡️</button>
             </div>
 
-            <!-- 5. قسم المساعد الذكي -->
+            <!-- 5. المساعد الذكي -->
             <div id="aiSection" class="section-content">
                 <h3>🤖 المساعد الطبي الذكي (عربي / English للحفظ السريع)</h3>
                 <div class="form-group">
                     <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
-                    <input type="text" id="aiQuery" placeholder="مثال: اشرح آلية عمل الأنسولين / Insulin mechanism">
+                    <input type="text" id="aiQuery" placeholder="مثال: Molecular / الهرمونات">
                 </div>
                 <button class="action-btn" style="background: var(--primary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
                 <div class="ai-chat-box" id="aiBox" style="display: none;"></div>
@@ -285,7 +279,7 @@
             res.style.display = 'block';
             if(!sel) { res.innerText = "اختر إجابة أولاً!"; return; }
             if(sel.value === 'correct') {
-                res.innerHTML = "🎉 كفو يا نادر! إجابة صحيحة 100%. علامتك **10/10** في سجل درجاتك.";
+                res.innerHTML = "🎉 كفو يا دكتور المستقبل! إجابة صحيحة 100%. علامتك **10/10** في سجل درجاتك.";
             } else {
                 res.innerHTML = "❌ إجابة خاطئة. علامتك **0/10**. ركز على الآليات الحيوية.";
             }
@@ -311,15 +305,18 @@
         }
 
         function askAI() {
-            const q = document.getElementById('aiQuery').value;
+            const query = document.getElementById('aiQuery').value || 'المصطلح الطبي';
             const box = document.getElementById('aiBox');
             box.style.display = 'block';
-            if(!q) { box.innerText = "اكتب سؤالك أولاً."; return; }
-            box.innerHTML = `<b>🤖 إجابة المساعد الذكي لتسهيل الحفظ:</b><br><br>` +
-                            `🔹 <b>العربية (${q}):</b><br>1. المفهوم والهدف.<br>2. الآلية بخطوات مرتبة.<br><br>` +
-                            `🔹 <b>English Retention Notes:</b><br>1. Core definition.<br>2. Step-by-step mechanism.`;
+            
+            box.innerHTML = `<b>🤖 إجابة المساعد الذكي لتسهيل الحفظ حول (${query}):</b><br><br>` +
+                            `🔹 <b>الشرح بالعربية:</b><br>` +
+                            `1. التعريف السريري الأساسي لـ (${query}) والهدف من دراسته.<br>` +
+                            `2. الآلية الحيوية مرتبة بخطوات منطقية لسرعة الاسترجاع.<br><br>` +
+                            `🔹 <b>English Retention Notes:</b><br>` +
+                            `1. Core clinical definition & significance of (${query}).<br>` +
+                            `2. Step-by-step mechanism optimized for quick memory retention.`;
         }
     </script>
 </body>
-    </html>
-    
+</html>
