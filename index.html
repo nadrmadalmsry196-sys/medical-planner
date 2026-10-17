@@ -96,7 +96,7 @@
         .result-box { margin-top: 15px; padding: 14px; background: #e0f2fe; border-radius: 8px; border-right: 5px solid var(--secondary); font-size: 13px; line-height: 1.6; color: #0369a1; }
         [data-theme="dark"] .result-box { background: #1e3a8a; color: #93c5fd; }
         
-        .ai-chat-box { background: var(--card-bg); border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; min-height: 140px; max-height: 260px; overflow-y: auto; margin-top: 15px; font-size: 13px; line-height: 1.6; border-right: 4px solid var(--medical-teal); }
+        .ai-chat-box { background: var(--card-bg); border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; min-height: 140px; max-height: 280px; overflow-y: auto; margin-top: 15px; font-size: 13px; line-height: 1.6; border-right: 4px solid var(--medical-teal); }
         .file-upload-box { border: 2px dashed var(--medical-teal); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
     </style>
 </head>
@@ -203,7 +203,7 @@
                 <h3>🤖 المساعد الطبي الذكي (عربي / English للحفظ السريع)</h3>
                 <div class="form-group">
                     <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
-                    <input type="text" id="aiQuery" placeholder="مثال: Molecular / الهرمونات">
+                    <input type="text" id="aiQuery" placeholder="مثال: Molecular / الهرمونات / Insulin">
                 </div>
                 <button class="action-btn" style="background: var(--primary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
                 <div class="ai-chat-box" id="aiBox" style="display: none;"></div>
@@ -305,17 +305,46 @@
         }
 
         function askAI() {
-            const query = document.getElementById('aiQuery').value || 'المصطلح الطبي';
+            const rawQuery = document.getElementById('aiQuery').value.trim();
             const box = document.getElementById('aiBox');
             box.style.display = 'block';
-            
-            box.innerHTML = `<b>🤖 إجابة المساعد الذكي لتسهيل الحفظ حول (${query}):</b><br><br>` +
-                            `🔹 <b>الشرح بالعربية:</b><br>` +
-                            `1. التعريف السريري الأساسي لـ (${query}) والهدف من دراسته.<br>` +
-                            `2. الآلية الحيوية مرتبة بخطوات منطقية لسرعة الاسترجاع.<br><br>` +
+
+            if(!rawQuery) {
+                box.innerHTML = "يرجى كتابة المصطلح أو السؤال الطبي أولاً.";
+                return;
+            }
+
+            let arDef = "";
+            let arMech = "";
+            let enDef = "";
+            let enMech = "";
+
+            const q = rawQuery.toLowerCase();
+
+            if(q.includes('moleculer') || q.includes('molecular') || q.includes('جزيئي')) {
+                arDef = "المستوى الجزيئي (Molecular Level): يدرس العمليات الحيوية والتشكيل البنيوي للجزيئات الحيوية كـ DNA والبروتينات داخل الخلية.";
+                arMech = "الآلية: تفاعل جزيئي دقيق يتم عبر نسخ الترجمة الجينية وبناء السلسلة البروتينية لتحديد وظيفة الخلية.";
+                enDef = "Molecular Level: Studies biological processes and structures of biomolecules like DNA and proteins within cells.";
+                enMech = "Mechanism: Precise molecular interactions via gene transcription and protein synthesis determining cellular function.";
+            } else if(q.includes('insulin') || q.includes('أنسولين')) {
+                arDef = "هرمون الأنسولين (Insulin): يُفرز من خلايا بيتا في البنكرياس لخفض مستوى السكر بالدم وإدخاله للخلايا.";
+                arMech = "الآلية: يرتبط بمستقبلاته على الغشاء الخلوي ليحفز بوابات الجلوكوز (GLUT4) للفتح ودخول السكر.";
+                enDef = "Insulin: Hormone secreted by pancreatic beta cells to lower blood glucose and promote cellular uptake.";
+                enMech = "Mechanism: Binds to cell surface receptors, triggering GLUT4 glucose transporter translocation.";
+            } else {
+                arDef = `المفهوم السريري لـ (${rawQuery}): دراسة الأسباب والخصائص الوظيفية المرتبطة بهذا المصطلح الطبي بدقة.`;
+                arMech = `الآلية والمسار الحيوي: تفاعل الأعضاء والخلايا لإنتاج الاستجابة العضوية المرتبطة بـ (${rawQuery}).`;
+                enDef = `Clinical definition of (${rawQuery}): Comprehensive analysis of functional characteristics and clinical significance.`;
+                enMech = `Pathophysiological mechanism: Step-by-step biological response associated with (${rawQuery}).`;
+            }
+
+            box.innerHTML = `<b>🤖 إجابة المساعد الذكي حول (${rawQuery}):</b><br><br>` +
+                            `🔹 <b>الشرح والتعريف بالعربية:</b><br>` +
+                            `1. <u>التعريف والصفات:</u> ${arDef}<br>` +
+                            `2. <u>الآلية والمسار:</u> ${arMech}<br><br>` +
                             `🔹 <b>English Retention Notes:</b><br>` +
-                            `1. Core clinical definition & significance of (${query}).<br>` +
-                            `2. Step-by-step mechanism optimized for quick memory retention.`;
+                            `1. <u>Definition & Properties:</u> ${enDef}<br>` +
+                            `2. <u>Mechanism:</u> ${enMech}`;
         }
     </script>
 </body>
