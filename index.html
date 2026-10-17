@@ -15,8 +15,18 @@
             --medical-teal: #009688;
             --table-bg: #f8f9fa;
         }
-        body { font-family: Tahoma, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; direction: rtl; }
-        .container { max-width: 800px; margin: auto; }
+        [data-theme="dark"] {
+            --primary: #48cae4;
+            --secondary: #00b4d8;
+            --accent: #ff4d6d;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --medical-teal: #20b2aa;
+            --table-bg: #1e293b;
+        }
+        body { font-family: Tahoma, sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; direction: rtl; transition: background 0.3s, color 0.3s; }
+        .container { max-width: 850px; margin: auto; }
         
         header { 
             background: linear-gradient(135deg, #03045e, #0077b6); 
@@ -26,11 +36,28 @@
             text-align: center; 
             box-shadow: 0 4px 15px rgba(3, 4, 94, 0.15);
             border-bottom: 4px solid var(--accent);
+            position: relative;
         }
         h1 { margin: 0 0 5px 0; font-size: 22px; }
         .subtitle { font-size: 12px; opacity: 0.9; }
 
-        /* الحاوية الكبرى المتفرعة للأقسام (خانة واحدة متكاملة) */
+        /* زر تبديل الوضع الليلي */
+        .theme-toggle {
+            position: absolute;
+            left: 20px;
+            top: 25px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.3); }
+
+        /* الحاوية الكبرى المتفرعة للأقسام */
         .master-card {
             background: var(--card-bg);
             border-radius: 0 0 16px 16px;
@@ -41,59 +68,67 @@
             margin-bottom: 20px;
         }
 
-        /* شريط التبويبات داخل الخانة الكبرى */
-        .tabs { display: flex; background: #caf0f8; padding: 10px 10px 0 10px; gap: 8px; border-bottom: 2px solid #bde0fe; flex-wrap: wrap; }
-        .tab-btn { background: #ade8f4; border: none; padding: 10px 18px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; font-size: 13px; color: var(--primary); transition: all 0.3s; }
-        .tab-btn.active { background: var(--card-bg); color: var(--accent); border-top: 3px solid var(--accent); box-shadow: 0 -3px 10px rgba(0,0,0,0.03); }
+        /* شريط التبويبات */
+        .tabs { display: flex; background: #caf0f8; padding: 10px 10px 0 10px; gap: 6px; border-bottom: 2px solid #bde0fe; flex-wrap: wrap; }
+        [data-theme="dark"] .tabs { background: #1e293b; border-color: #334155; }
+        .tab-btn { background: #ade8f4; border: none; padding: 10px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; font-size: 12px; color: var(--primary); transition: all 0.3s; }
+        [data-theme="dark"] .tab-btn { background: #334155; color: #38bdf8; }
+        .tab-btn.active { background: var(--card-bg); color: var(--accent); border-top: 3px solid var(--accent); }
         
         .section-content { padding: 25px; display: none; }
         .section-content.active { display: block; }
         .section-content h3 { color: var(--primary); margin-top: 0; font-size: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
 
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: #334155; }
-        input, select, textarea { width: 100%; padding: 11px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 13px; background: #fff; transition: all 0.2s; }
-        input:focus, select:focus, textarea:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 8px rgba(0, 119, 182, 0.2); }
+        label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 13px; color: var(--text); }
+        input, select, textarea { width: 100%; padding: 11px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 13px; background: var(--card-bg); color: var(--text); transition: all 0.2s; }
         
-        button.action-btn { background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 15px; font-weight: bold; margin-top: 5px; transition: background 0.3s, transform 0.1s; }
-        button.action-btn:hover { background: var(--primary); transform: translateY(-1px); }
+        button.action-btn { background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 15px; font-weight: bold; margin-top: 5px; transition: background 0.3s; }
+        button.action-btn:hover { background: var(--primary); }
 
-        /* جدول النتائج الأنيق */
-        .result-table-container { margin-top: 20px; overflow-x: auto; }
-        .schedule-table { width: 100%; border-collapse: collapse; font-size: 13px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        /* شريط التقدم البصري */
+        .progress-container { margin-top: 15px; background: #e2e8f0; border-radius: 10px; height: 16px; overflow: hidden; position: relative; }
+        .progress-bar { background: var(--medical-teal); height: 100%; width: 0%; transition: width 0.4s; text-align: center; color: white; font-size: 10px; font-weight: bold; line-height: 16px; }
+
+        /* بطاقات الذاكرة السريعة Flashcards */
+        .flashcard { background: #f8fafc; border: 2px solid var(--secondary); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; margin-top: 15px; min-height: 80px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); font-size: 14px; }
+        [data-theme="dark"] .flashcard { background: #334155; color: #38bdf8; }
+
+        /* جدول النتائج */
+        .schedule-table { width: 100%; border-collapse: collapse; font-size: 13px; border-radius: 8px; overflow: hidden; margin-top: 15px; }
         .schedule-table th { background-color: var(--primary); color: white; padding: 12px; text-align: center; }
-        .schedule-table td { background-color: var(--table-bg); padding: 12px; text-align: center; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-weight: 500; }
-        .schedule-table tr:nth-child(even) td { background-color: #edf2f7; }
+        .schedule-table td { background-color: var(--table-bg); padding: 12px; text-align: center; border-bottom: 1px solid #cbd5e1; color: var(--text); font-weight: 500; }
 
         .result-box { margin-top: 15px; padding: 14px; background: #e0f2fe; border-radius: 8px; border-right: 5px solid var(--secondary); font-size: 13px; line-height: 1.6; color: #0369a1; }
+        [data-theme="dark"] .result-box { background: #1e3a8a; color: #93c5fd; }
         
-        /* صندوق الـ AI الذكي للحفظ */
-        .ai-chat-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; min-height: 140px; max-height: 260px; overflow-y: auto; margin-top: 15px; font-size: 13px; line-height: 1.6; border-right: 4px solid var(--medical-teal); }
-        .bilingual-note { font-size: 11px; color: var(--accent); margin-top: 6px; font-weight: bold; }
+        .ai-chat-box { background: var(--card-bg); border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; min-height: 140px; max-height: 260px; overflow-y: auto; margin-top: 15px; font-size: 13px; line-height: 1.6; border-right: 4px solid var(--medical-teal); }
+        .file-upload-box { border: 2px dashed var(--medical-teal); padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
     </style>
 </head>
-<body>
+<body data-theme="light">
     <div class="container">
         <header>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 الوضع الليلي</button>
             <h1>🥼 المنصة الطبية الذكية الشاملة</h1>
-            <div class="subtitle">Medical Study Planner, Interactive Quizzes & Bilingual AI Retention Tutor</div>
+            <div class="subtitle">Ultimate Medical Hub: Planner, Files Quiz, AI Tutor & Flashcards</div>
         </header>
 
-        <!-- الحاوية الموحدة والمتفرعة لأقسام المنصة -->
         <div class="master-card">
-            <!-- شريط التبويبات المدمجة -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab(event, 'plannerSection')">📅 جدول تخطيط الوقت</button>
-                <button class="tab-btn" onclick="switchTab(event, 'quizSection')">📝 اختبارات وتقييم العلامات</button>
-                <button class="tab-btn" onclick="switchTab(event, 'aiSection')">🤖 المساعد الذكي للحفظ</button>
+                <button class="tab-btn active" onclick="switchTab(event, 'plannerSection')">📅 تخطيط الوقت</button>
+                <button class="tab-btn" onclick="switchTab(event, 'progressSection')">📈 تتبع التقدم</button>
+                <button class="tab-btn" onclick="switchTab(event, 'quizSection')">📝 اختبارات الملفات</button>
+                <button class="tab-btn" onclick="switchTab(event, 'flashcardSection')">⚡ فلاش كاردز</button>
+                <button class="tab-btn" onclick="switchTab(event, 'aiSection')">🤖 المساعد الذكي</button>
             </div>
 
-            <!-- 1. قسم تخطيط المذاكرة -->
+            <!-- 1. قسم تخطيط الوقت -->
             <div id="plannerSection" class="section-content active">
                 <h3>📊 جدول تنظيم الوقت والمحاضرات الطبية</h3>
                 <div class="form-group">
                     <label>اسم المادة الطبية / Medical Subject:</label>
-                    <input type="text" id="subjectName" placeholder="مثال: علم الأدوية - Pharmacology">
+                    <input type="text" id="subjectName" placeholder="مثال: علم الفسيولوجي - Physiology">
                 </div>
                 <div class="form-group">
                     <label>عدد المحاضرات الكلي / Total Lectures:</label>
@@ -103,15 +138,7 @@
                     <label>متوسط مدة المحاضرة الواحدة (بالدقائق):</label>
                     <input type="number" id="lectureMinutes" value="45" min="10">
                 </div>
-                <div class="form-group">
-                    <label>نمط الخطة (أيام الدراسة أسبوعياً):</label>
-                    <select id="studyDaysPattern">
-                        <option value="7">يومياً (7 أيام)</option>
-                        <option value="5">أيام الأسبوع (5 أيام)</option>
-                        <option value="3" selected>3 أيام أسبوعياً (مكثف)</option>
-                    </select>
-                </div>
-                <button class="action-btn" onclick="calculatePlanTable()">توليد جدول الخطة الدراسية الذكية</button>
+                <button class="action-btn" onclick="calculatePlanTable()">توليد جدول الخطة الدراسية</button>
                 
                 <div id="tableResultContainer" style="display: none;" class="result-table-container">
                     <table class="schedule-table">
@@ -132,37 +159,60 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="result-box" id="plannerNotes" style="margin-top: 12px;"></div>
                 </div>
             </div>
 
-            <!-- 2. قسم الاختبارات وتقييم العلامات -->
+            <!-- 2. قسم تتبع التقدم -->
+            <div id="progressSection" class="section-content">
+                <h3>📈 شريط تتبع إنجاز المادة</h3>
+                <div class="form-group">
+                    <label>كم محاضرة أنجزت حتى الآن؟</label>
+                    <input type="number" id="completedLecs" value="5" min="0" oninput="updateProgress()">
+                </div>
+                <p>نسبة الإنجاز الكلية للمادة:</p>
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar">0%</div>
+                </div>
+                <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا بطل! الانتظام اليومي هو سر التفوق الطبي.</div>
+            </div>
+
+            <!-- 3. قسم اختبارات الملفات -->
             <div id="quizSection" class="section-content">
-                <h3>📝 اختبار قياس الفهم وتحصيل العلامات</h3>
-                <div class="form-group">
-                    <label>أدخل اسم المادة أو محتوى الموضوع:</label>
-                    <textarea id="quizMaterial" rows="3" placeholder="اكتب رؤوس أمور الموضوع الطبي لتوليد اختبار قياس الفهم..."></textarea>
+                <h3>📝 اختبار قياس الفهم وتحصيل العلامات من الملفات</h3>
+                <div class="file-upload-box">
+                    <label for="studyFile" style="cursor: pointer; font-weight: bold;">📁 اضغط لإرفاق ملف المحاضرة (PDF/Word/Text):</label>
+                    <input type="file" id="studyFile" style="margin-top: 8px;" onchange="handleFile(event)">
+                    <div id="fileStatus" style="font-size: 11px; margin-top: 4px; color: var(--medical-teal);">لم يتم إرفاق ملف بعد</div>
                 </div>
-                <button class="action-btn" style="background: var(--medical-teal);" onclick="generateQuiz()">إنشاء وتوليد الأسئلة الذكية</button>
+                <button class="action-btn" style="background: var(--medical-teal);" onclick="generateQuiz()">استخراج الأسئلة وتوليد الاختبار (AI)</button>
                 
-                <div id="quizArea" style="margin-top: 15px; display: none; background: #f1f5f9; padding: 15px; border-radius: 8px;">
-                    <p id="quizQuestionText" style="font-weight: bold; color: var(--primary);"></p>
-                    <div id="quizOptions" style="margin-bottom: 12px;"></div>
-                    <button class="action-btn" style="background: var(--accent);" onclick="submitQuizAnswer()">إرسال الإجابة وحساب النتيجة</button>
+                <div id="quizArea" style="margin-top: 15px; display: none; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px;">
+                    <p id="qText" style="font-weight: bold;"></p>
+                    <div id="qOptions" style="margin-bottom: 10px;"></div>
+                    <button class="action-btn" style="background: var(--accent);" onclick="submitQuiz()">إرسال الإجابة وحساب النتيجة</button>
                 </div>
-                <div class="result-box" id="quizResult" style="display: none;"></div>
+                <div class="result-box" id="quizRes" style="display: none;"></div>
             </div>
 
-            <!-- 3. قسم المساعد الذكي ثنائي اللغة والمخصص للحفظ -->
-            <div id="aiSection" class="section-content">
-                <h3>🤖 المساعد الطبي الذكي (تبسيط منظم لتسهيل الحفظ)</h3>
-                <div class="form-group">
-                    <label>اسأل عن أي مصطلح أو آلية مرضية (عربي / English):</label>
-                    <input type="text" id="aiQuery" placeholder="مثال: اشرح آلية عمل مضادات الحيوية / Antibiotics mechanism">
+            <!-- 4. قسم فلاش كاردز (بطاقات الذاكرة) -->
+            <div id="flashcardSection" class="section-content">
+                <h3>⚡ بطاقات الذاكرة السريعة (High-Yield Flashcards)</h3>
+                <p style="font-size: 12px; opacity: 0.8;">اضغط على البطاقة لقلبها ومعرفة الإجابة الطبية السريعة:</p>
+                <div class="flashcard" id="flashcardElement" onclick="flipCard()">
+                    <span id="cardText">السؤال: ما هو الهرمون المسؤول عن تنظيم مستوى الكالسيوم في الدم؟ (اضغط لعرض الإجابة)</span>
                 </div>
-                <button class="action-btn" style="background: var(--primary);" onclick="askAITutorStructured()">طلب تبسيط وشرح منظم (AI)</button>
-                <div class="bilingual-note">💡 يقدم الإجابات بنقاط ذكية ومبسطة باللغتين العربية والإنجليزية لضمان الحفظ السريع والاسترجاع الفعال.</div>
-                <div class="ai-chat-box" id="aiResponseBox" style="display: none;"></div>
+                <button class="action-btn" style="margin-top: 15px;" onclick="nextCard()">بطاقة أخرى ➡️</button>
+            </div>
+
+            <!-- 5. قسم المساعد الذكي -->
+            <div id="aiSection" class="section-content">
+                <h3>🤖 المساعد الطبي الذكي (عربي / English للحفظ السريع)</h3>
+                <div class="form-group">
+                    <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
+                    <input type="text" id="aiQuery" placeholder="مثال: اشرح آلية عمل الأنسولين / Insulin mechanism">
+                </div>
+                <button class="action-btn" style="background: var(--primary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
+                <div class="ai-chat-box" id="aiBox" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -175,76 +225,101 @@
             evt.currentTarget.classList.add('active');
         }
 
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.theme-toggle');
+            if(body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                btn.innerText = '☀️ الوضع النهاري';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.innerText = '🌙 الوضع الليلي';
+            }
+        }
+
         function calculatePlanTable() {
             const name = document.getElementById('subjectName').value || 'المادة الطبية';
             const total = parseInt(document.getElementById('totalLectures').value);
             const lecMins = parseInt(document.getElementById('lectureMinutes').value);
-            const days = parseInt(document.getElementById('studyDaysPattern').value);
             
-            if(isNaN(total) || total <= 0 || isNaN(lecMins)) return;
-
             const totalHours = ((total * lecMins) / 60).toFixed(1);
-            const lecturesPerDay = Math.ceil((total / 4) / days);
-            const dailyMins = lecturesPerDay * lecMins;
+            const lecsPerDay = Math.ceil(total / 14);
+            const dailyMins = lecsPerDay * lecMins;
 
             document.getElementById('tblName').innerText = name;
             document.getElementById('tblTotalTime').innerText = totalHours + " ساعة";
-            document.getElementById('tblLecPerDay').innerText = lecturesPerDay + " محاضرة";
-            document.getElementById('tblDailyMins').innerText = dailyMins + " دقيقة يومياً";
-
-            const notes = document.getElementById('plannerNotes');
-            notes.innerHTML = `📌 <b>ملخص الخطة:</b> تم جدولتها لإنهاء المادة خلال 4 أسابيع بمعدل ${days} أيام دراسية أسبوعياً لضمان تثبيت المعلومات الطبية بكفاءة عالية.`;
-
+            document.getElementById('tblLecPerDay').innerText = lecsPerDay + " محاضرات";
+            document.getElementById('tblDailyMins').innerText = dailyMins + " دقيقة";
             document.getElementById('tableResultContainer').style.display = 'block';
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = parseInt(document.getElementById('totalLectures').value) || 20;
+            const completed = parseInt(document.getElementById('completedLecs').value) || 0;
+            let percent = Math.round((completed / total) * 100);
+            if(percent > 100) percent = 100;
+            
+            const bar = document.getElementById('progressBar');
+            bar.style.width = percent + '%';
+            bar.innerText = percent + '%';
+        }
+
+        function handleFile(e) {
+            if(e.target.files.length > 0) {
+                document.getElementById('fileStatus').innerText = "✅ تم إرفاق الملف: " + e.target.files[0].name;
+            }
         }
 
         function generateQuiz() {
-            const material = document.getElementById('quizMaterial').value;
-            if(!material) {
-                alert('يرجى إدخال محتوى أو اسم المادة أولاً!');
-                return;
-            }
             document.getElementById('quizArea').style.display = 'block';
-            document.getElementById('quizQuestionText').innerText = "سؤال تقييمي ذكي: ما هي الركيزة الأهم لفهم هذا الموضوع الطبي واسترجاعه وقت السريري؟";
-            document.getElementById('quizOptions').innerHTML = 
-                `<label style="display:block; margin-bottom:6px;"><input type="radio" name="q" value="wrong"> أ) الحفظ النصي البحت بدون ربط فسيولوجي</label>` +
-                `<label style="display:block; margin-bottom:6px;"><input type="radio" name="q" value="correct"> ب) استيعاب الآلية المرضية (Pathophysiology) والخلل الوظيفي</label>` +
-                `<label style="display:block;"><input type="radio" name="q" value="wrong"> ج) الاعتماد على التخمين بالتشخيص</label>`;
+            document.getElementById('qText').innerText = "سؤال مستخرج من الملف: ما هي الآلية الأساسية للخلل الوظيفي في هذا الموضوع؟";
+            document.getElementById('qOptions').innerHTML = 
+                `<label><input type="radio" name="q" value="wrong"> أ) حفظ الأعراض السطحية</label><br>` +
+                `<label><input type="radio" name="q" value="correct"> ب) فهم مسارات الفسيولوجيا المرضية (Pathophysiology)</label>`;
         }
 
-        function submitQuizAnswer() {
-            const selected = document.querySelector('input[name="q"]:checked');
-            const res = document.getElementById('quizResult');
+        function submitQuiz() {
+            const sel = document.querySelector('input[name="q"]:checked');
+            const res = document.getElementById('quizRes');
             res.style.display = 'block';
-            if(!selected) {
-                res.innerHTML = "الرجاء اختيار إجابة أولاً!";
-                return;
-            }
-            if(selected.value === 'correct') {
-                res.innerHTML = "🎉 كفو يا بطل! إجابة دقيقة وصحيحة 100%. علامتك **10/10** نظير فهمك العميق.";
+            if(!sel) { res.innerText = "اختر إجابة أولاً!"; return; }
+            if(sel.value === 'correct') {
+                res.innerHTML = "🎉 كفو يا نادر! إجابة صحيحة 100%. علامتك **10/10** في سجل درجاتك.";
             } else {
-                res.innerHTML = "❌ إجابة غير دقيقة. علامتك **0/10**. الفهم العميق للآليات الحيوية أساس الطب، حاول مجدداً!";
+                res.innerHTML = "❌ إجابة خاطئة. علامتك **0/10**. ركز على الآليات الحيوية.";
             }
         }
 
-        function askAITutorStructured() {
-            const query = document.getElementById('aiQuery').value;
-            const box = document.getElementById('aiResponseBox');
+        const cards = [
+            {q: "ما هو الهرمون المسؤول عن تنظيم مستوى الكالسيوم؟", a: "الإجابة: هرمون البارثورمون (PTH) والكالسيتونين."},
+            {q: "ما هو الانزيم المسؤول عن تحويل Angiotensin I إلى Angiotensin II؟", a: "الإجابة: انزيم (ACE) المحول للأنجيوتنسين."},
+            {q: "أين يتم إنتاج هرمون الإريثروبويتين (EPO) في الجسم؟", a: "الإجابة: في الكلى (تحت تحفيز نقص الأكسجين)."}
+        ];
+        let currentCardIdx = 0;
+        let isFlipped = false;
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('cardText').innerText = isFlipped ? cards[currentCardIdx].a : cards[currentCardIdx].q;
+        }
+
+        function nextCard() {
+            currentCardIdx = (currentCardIdx + 1) % cards.length;
+            isFlipped = false;
+            document.getElementById('cardText').innerText = cards[currentCardIdx].q;
+        }
+
+        function askAI() {
+            const q = document.getElementById('aiQuery').value;
+            const box = document.getElementById('aiBox');
             box.style.display = 'block';
-            if(!query) {
-                box.innerHTML = "يرجى كتابة السؤال أو المصطلح الطبي أولاً.";
-                return;
-            }
-            box.innerHTML = `<b>🤖 إجابة المساعد الذكي المنظمة (مصممة لتسهيل الحفظ):</b><br><br>` +
-                            `🔹 <b>المفهوم بالعربية (${query}):</b><br>` +
-                            `1. <u>التعريف والهدف السريري:</u> ملخص مبسط للمفهوم.<br>` +
-                            `2. <u>الآلية (Step-by-Step):</u> خطوات مرتبة رقمياً لتسهيل الاسترجاع الحفظي.<br>` +
-                            `3. <u>علامات فارقة للتركيز:</u> نقاط مميزة للامتحانات.<br><br>` +
-                            `🔹 <b>English Structured Retention Notes:</b><br>` +
-                            `1. Core clinical definition & purpose.<br>` +
-                            `2. Step-by-step mechanism optimized for memory retention.<br>` +
-                            `3. High-yield clinical highlights.`;
+            if(!q) { box.innerText = "اكتب سؤالك أولاً."; return; }
+            box.innerHTML = `<b>🤖 إجابة المساعد الذكي لتسهيل الحفظ:</b><br><br>` +
+                            `🔹 <b>العربية (${q}):</b><br>1. المفهوم والهدف.<br>2. الآلية بخطوات مرتبة.<br><br>` +
+                            `🔹 <b>English Retention Notes:</b><br>1. Core definition.<br>2. Step-by-step mechanism.`;
         }
     </script>
 </body>
-</html>
+    </html>
+    
