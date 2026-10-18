@@ -10,9 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  
-  <!-- مكتبة مصادقة Google الرسمية -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     :root {
@@ -83,9 +80,9 @@
     .user-info-badge {
       display: flex; justify-content: space-between; align-items: center;
       background: rgba(255,255,255,0.15); padding: 8px 15px; border-radius: 12px;
-      margin-top: 12px; font-size: 12px; backdrop-filter: blur(5px);
+      margin-top: 12px; font-size: 12px; backdrop-filter: blur(5px); flex-wrap: wrap; gap: 8px;
     }
-    .logout-btn { background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+    .logout-btn { background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
     .master-card {
       background: var(--surface);
@@ -140,7 +137,7 @@
     .progress-bar { background: var(--accent); height: 100%; width: 0%; transition: width 0.4s; text-align: center; color: white; font-size: 10px; font-weight: bold; line-height: 16px; }
 
     .quiz-card { background: var(--surface-2); padding: 20px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border); }
-    .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 700; color: var(--text); transition: 0.2s; }
+    .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 700; color: var(--text); transition: 0.2s; cursor: pointer; }
     .option-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
     .proctor-modal {
@@ -163,8 +160,8 @@
       <h2>مساحتك الطبية الذكية</h2>
       <p>يرجى تسجيل الدخول بحساب Google الخاص بك للوصول إلى المنصة وسجل نقاطك الأكاديمية.</p>
       
-      <!-- زر تسجيل الدخول بحساب Google الافتراضي أو المباشر -->
-      <button class="btn" style="background: #db4437; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="simulateGoogleLogin()">
+      <!-- زر تسجيل الدخول بتفعيل مباشر ومستقل -->
+      <button type="button" class="btn" style="background: #db4437; display: flex; align-items: center; justify-content: center; gap: 10px;" id="loginBtn">
         <i class="fa-brands fa-google"></i> تسجيل الدخول بحساب Google
       </button>
     </div>
@@ -173,22 +170,22 @@
   <!-- محتوى المنصة (يظهر بعد تسجيل الدخول) -->
   <div id="appContent" class="container" style="display: none;">
     <header>
-      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 الوضع الليلي</button>
+      <button type="button" class="theme-toggle" id="themeBtn">🌙 الوضع الليلي</button>
       <h1>🥼 مساحتك الطبية الذكية</h1>
       <p>منصتك المتكاملة لتنظيم رحلتك في الطب البشري يا دكتور المستقبل</p>
       
       <div class="user-info-badge">
         <span>👤 الطالب: <b id="studentName">طالب طب</b> (<span id="studentEmail">student@gmail.com</span>) | 🏆 النقاط: <b id="userPoints">0</b></span>
-        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        <button type="button" class="logout-btn" id="logoutBtn">تسجيل الخروج</button>
       </div>
     </header>
 
     <div class="master-card">
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
-        <button class="tab-btn" onclick="switchTab(event, 'progress')"><i class="fa-solid fa-chart-line"></i> تتبع التقدم</button>
-        <button class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات ونقاط</button>
-        <button class="tab-btn" onclick="switchTab(event, 'ai')"><i class="fa-solid fa-robot"></i> المساعد الذكي</button>
+        <button type="button" class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
+        <button type="button" class="tab-btn" onclick="switchTab(event, 'progress')"><i class="fa-solid fa-chart-line"></i> تتبع التقدم</button>
+        <button type="button" class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات ونقاط</button>
+        <button type="button" class="tab-btn" onclick="switchTab(event, 'ai')"><i class="fa-solid fa-robot"></i> المساعد الذكي</button>
       </div>
 
       <!-- 1. تخطيط الوقت -->
@@ -206,7 +203,7 @@
           <label>متوسط مدة المحاضرة (بالدقائق):</label>
           <input type="number" id="lecMins" value="45" min="10">
         </div>
-        <button class="btn" onclick="calculatePlan()">توليد جدول الخطة الدراسية</button>
+        <button type="button" class="btn" onclick="calculatePlan()">توليد جدول الخطة الدراسية</button>
         <div class="result-box" id="planResult" style="display: none;"></div>
       </div>
 
@@ -231,7 +228,7 @@
           <label>الصق نص أو ملخص المحاضرة الطبية هنا:</label>
           <textarea id="lectureText" rows="5" placeholder="الصق النص هنا ليتم تحليل وتوليد الأسئلة منه تلقائياً..."></textarea>
         </div>
-        <button class="btn" style="background: var(--accent);" onclick="triggerProctorModal()">بدء الاختبار (تفعيل نظام المراقبة والنقاط)</button>
+        <button type="button" class="btn" style="background: var(--accent);" onclick="triggerProctorModal()">بدء الاختبار (تفعيل نظام المراقبة والنقاط)</button>
         
         <div id="quizContainer" style="display: none;"></div>
         <div class="result-box" id="finalQuizRes" style="display: none;"></div>
@@ -244,7 +241,7 @@
           <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
           <input type="text" id="aiQuery" placeholder="مثال: Molecular / Insulin / الهرمونات">
         </div>
-        <button class="btn" style="background: var(--secondary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
+        <button type="button" class="btn" style="background: var(--secondary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
         <div class="result-box" id="aiBox" style="display: none;"></div>
       </div>
     </div>
@@ -258,35 +255,46 @@
       <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
         تنبيه يا دكتور المستقبل: يتم الآن مراقبة جلسة الامتحان عبر الذكاء الاصطناعي (AI Proctoring) لضمان النزاهة وسجل الأداء. يرجى التركيز وعدم مغادرة الصفحة.
       </p>
-      <button class="btn" onclick="startActualQuiz()">مفهوم، ابدأ الاختبار الآن 🚀</button>
+      <button type="button" class="btn" onclick="startActualQuiz()">مفهوم، ابدأ الاختبار الآن 🚀</button>
     </div>
   </div>
 
   <script>
-    // فحص حالة تسجيل الدخول مسبقاً
-    window.onload = function() {
+    // تفعيل أزرار تسجيل الدخول والخروج بأمان عند تحميل المستند
+    document.addEventListener("DOMContentLoaded", function() {
       const savedEmail = localStorage.getItem('medical_hub_email');
       const savedName = localStorage.getItem('medical_hub_name');
       if (savedEmail) {
         showApp(savedName, savedEmail);
       }
-    };
 
-    // محاكاة تسجيل الدخول بحساب Google (يمكن ربطه بحساب الطالب الحقيقي)
-    function simulateGoogleLogin() {
-      // طلب الإيميل أو استخدام حساب افتراضي مرتب بحساب الطالب نادر
-      let userEmail = prompt("أدخل بريدك الإلكتروني (Gmail) الخاص بك:", "nader.almasri@gmail.com");
-      if (userEmail && userEmail.includes("@")) {
-        let userName = userEmail.split('@')[0];
-        userName = userName.charAt(0).toUpperCase() + userName.slice(1);
-        
-        localStorage.setItem('medical_hub_email', userEmail);
-        localStorage.setItem('medical_hub_name', userName);
-        showApp(userName, userEmail);
-      } else {
-        alert("الرجاء إدخال بريد Gmail صحيح!");
-      }
-    }
+      document.getElementById('loginBtn').addEventListener('click', function() {
+        let userEmail = prompt("أدخل بريدك الإلكتروني (Gmail) الخاص بك:", "nader.almasri@gmail.com");
+        if (userEmail && userEmail.includes("@")) {
+          let userName = userEmail.split('@')[0];
+          userName = userName.charAt(0).toUpperCase() + userName.slice(1);
+          
+          localStorage.setItem('medical_hub_email', userEmail);
+          localStorage.setItem('medical_hub_name', userName);
+          showApp(userName, userEmail);
+        } else if (userEmail !== null) {
+          alert("الرجاء إدخال بريد Gmail صحيح!");
+        }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', function() {
+        localStorage.removeItem('medical_hub_email');
+        localStorage.removeItem('medical_hub_name');
+        document.getElementById('appContent').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'flex';
+      });
+
+      document.getElementById('themeBtn').addEventListener('click', function() {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        this.innerHTML = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
+      });
+    });
 
     function showApp(name, email) {
       document.getElementById('loginScreen').style.display = 'none';
@@ -294,16 +302,8 @@
       document.getElementById('studentName').innerText = name;
       document.getElementById('studentEmail').innerText = email;
       
-      // تحميل نقاط الطالب الخاصة بهذا الإيميل
       let userPoints = parseInt(localStorage.getItem('points_' + email)) || 0;
       document.getElementById('userPoints').innerText = userPoints;
-    }
-
-    function logout() {
-      localStorage.removeItem('medical_hub_email');
-      localStorage.removeItem('medical_hub_name');
-      document.getElementById('appContent').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
     }
 
     function addPointsForUser(pts) {
@@ -319,12 +319,6 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(sectionId).classList.add('active');
       evt.currentTarget.classList.add('active');
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-      const isDark = document.body.classList.contains('dark');
-      document.getElementById('themeBtn').innerHTML = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
     }
 
     function calculatePlan() {
@@ -400,7 +394,7 @@
           <p style="font-weight:700; margin-bottom:15px;">${qObj.q}</p>`.trim();
         
         qObj.options.forEach((opt, idx) => {
-          html += `<button class="option-btn" onclick="checkAnswer(${idx})">${opt}</button>`;
+          html += `<button type="button" class="option-btn" onclick="checkAnswer(${idx})">${opt}</button>`;
         });
         html += `</div>`;
         container.innerHTML = html;
@@ -425,6 +419,4 @@
       res.style.display = 'block';
       
       const earnedPoints = score * 10;
-      addPointsForUser(earnedPoints);
-
-      let gradeMsg = score >= 8 ? "🌟 ممتاز جداً! أداء بطولي تحت الرقابة!" : "💪
+   
