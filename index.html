@@ -49,17 +49,21 @@
 
     .container { max-width: 900px; margin: auto; }
 
-    /* شاشة تسجيل الدخول */
+    /* شاشة تسجيل الدخول المباشرة والمضمونة */
     #loginScreen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 80vh; text-align: center;
     }
     .login-card {
-      background: var(--surface); border: 1px solid var(--border); padding: 40px;
+      background: var(--surface); border: 1px solid var(--border); padding: 35px;
       border-radius: var(--radius); box-shadow: var(--shadow); max-width: 450px; width: 100%;
     }
-    .login-card h2 { color: var(--primary); font-weight: 900; margin-bottom: 10px; font-size: 24px; }
-    .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 25px; }
+    .login-card h2 { color: var(--primary); font-weight: 900; margin-bottom: 8px; font-size: 22px; }
+    .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .login-input {
+      width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--surface-2); color: var(--text); margin-bottom: 15px; outline: none; font-size: 14px; text-align: center;
+    }
 
     header {
       background: linear-gradient(135deg, #071426, #087f8c);
@@ -73,7 +77,7 @@
     .theme-toggle {
       position: absolute; left: 20px; top: 25px;
       background: rgba(255,255,255,0.2); border: none; color: white;
-      padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px;
+      padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer;
     }
     .theme-toggle:hover { background: rgba(255,255,255,0.3); }
 
@@ -153,21 +157,23 @@
 </head>
 <body>
 
-  <!-- شاشة تسجيل الدخول الأولى -->
+  <!-- شاشة تسجيل الدخول المباشرة -->
   <div id="loginScreen" class="container">
     <div class="login-card">
       <div style="font-size: 45px; color: var(--primary); margin-bottom: 15px;"><i class="fa-solid fa-stethoscope"></i></div>
       <h2>مساحتك الطبية الذكية</h2>
-      <p>يرجى تسجيل الدخول بحساب Google الخاص بك للوصول إلى المنصة وسجل نقاطك الأكاديمية.</p>
+      <p>أدخل بريدك الإلكتروني (Gmail) واسمك للوصول إلى المنصة وحفظ سجلك الأكاديمي.</p>
       
-      <!-- زر تسجيل الدخول بتفعيل مباشر ومستقل -->
+      <input type="text" id="inputName" class="login-input" placeholder="اسمك الكريم (مثال: د. نادر)">
+      <input type="email" id="inputEmail" class="login-input" placeholder="البريد الإلكتروني (student@gmail.com)">
+      
       <button type="button" class="btn" style="background: #db4437; display: flex; align-items: center; justify-content: center; gap: 10px;" id="loginBtn">
         <i class="fa-brands fa-google"></i> تسجيل الدخول بحساب Google
       </button>
     </div>
   </div>
 
-  <!-- محتوى المنصة (يظهر بعد تسجيل الدخول) -->
+  <!-- محتوى المنصة -->
   <div id="appContent" class="container" style="display: none;">
     <header>
       <button type="button" class="theme-toggle" id="themeBtn">🌙 الوضع الليلي</button>
@@ -221,7 +227,7 @@
         <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا دكتور المستقبل! الانتظام اليومي هو سر التفوق الطبي.</div>
       </div>
 
-      <!-- 3. اختبارات الملفات ونظام النقاط والمراقبة الوهمية -->
+      <!-- 3. اختبارات ونقاط -->
       <div id="quiz" class="section-content">
         <h3>📝 اختبار قياس الفهم (مع نظام النقاط والمراقبة)</h3>
         <div class="form-group">
@@ -260,7 +266,6 @@
   </div>
 
   <script>
-    // تفعيل أزرار تسجيل الدخول والخروج بأمان عند تحميل المستند
     document.addEventListener("DOMContentLoaded", function() {
       const savedEmail = localStorage.getItem('medical_hub_email');
       const savedName = localStorage.getItem('medical_hub_name');
@@ -269,17 +274,17 @@
       }
 
       document.getElementById('loginBtn').addEventListener('click', function() {
-        let userEmail = prompt("أدخل بريدك الإلكتروني (Gmail) الخاص بك:", "nader.almasri@gmail.com");
-        if (userEmail && userEmail.includes("@")) {
-          let userName = userEmail.split('@')[0];
-          userName = userName.charAt(0).toUpperCase() + userName.slice(1);
-          
-          localStorage.setItem('medical_hub_email', userEmail);
-          localStorage.setItem('medical_hub_name', userName);
-          showApp(userName, userEmail);
-        } else if (userEmail !== null) {
-          alert("الرجاء إدخال بريد Gmail صحيح!");
+        const nameVal = document.getElementById('inputName').value.trim();
+        const emailVal = document.getElementById('inputEmail').value.trim();
+
+        if (!nameVal || !emailVal || !emailVal.includes('@')) {
+          alert("الرجاء إدخال الاسم وبريد Gmail صحيح!");
+          return;
         }
+
+        localStorage.setItem('medical_hub_email', emailVal);
+        localStorage.setItem('medical_hub_name', nameVal);
+        showApp(nameVal, emailVal);
       });
 
       document.getElementById('logoutBtn').addEventListener('click', function() {
@@ -413,10 +418,4 @@
     }
 
     function showFinalResult() {
-      const container = document.getElementById('quizContainer');
-      container.style.display = 'none';
-      const res = document.getElementById('finalQuizRes');
-      res.style.display = 'block';
-      
-      const earnedPoints = score * 10;
-   
+      const container
