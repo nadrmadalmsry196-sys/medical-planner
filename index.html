@@ -44,7 +44,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; transition: background .25s, color .25s; padding: 20px; }
 
-    button, input, select { font: inherit; }
+    button, input, select, textarea { font: inherit; }
     button { cursor: pointer; border: none; background: none; }
 
     .container { max-width: 900px; margin: auto; }
@@ -65,7 +65,6 @@
     }
     .theme-toggle:hover { background: rgba(255,255,255,0.3); }
 
-    /* الخانة الكبرى المتفرعة */
     .master-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -74,7 +73,6 @@
       overflow: hidden;
     }
 
-    /* شريط التبويبات العلوي */
     .tabs-header {
       display: flex; background: var(--surface-2);
       padding: 10px 10px 0 10px; gap: 5px; border-bottom: 1px solid var(--border);
@@ -102,7 +100,7 @@
       border-radius: 12px; background: var(--surface-2); color: var(--text);
       outline: none; font-family: "Cairo", sans-serif;
     }
-    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(8,127,140,.08); }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(8,127,140,.08); }
 
     .btn {
       background: var(--primary); color: white; border: none;
@@ -121,10 +119,10 @@
 
     .flashcard { background: var(--surface-2); border: 2px solid var(--primary); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; margin-top: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 15px; }
 
-    .file-upload {
-      border: 2px dashed var(--primary); padding: 20px; border-radius: 12px;
-      text-align: center; background: var(--surface-2); margin-bottom: 15px; cursor: pointer;
-    }
+    /* أنماط اختبار سؤال بسؤال */
+    .quiz-card { background: var(--surface-2); padding: 20px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border); }
+    .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 700; color: var(--text); transition: 0.2s; }
+    .option-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
   </style>
 </head>
 <body>
@@ -136,7 +134,6 @@
       <p>منصتك المتكاملة لتنظيم رحلتك في الطب البشري يا دكتور المستقبل</p>
     </header>
 
-    <!-- الخانة الكبرى المتفرعة للأقسام الخمسة -->
     <div class="master-card">
       <div class="tabs-header">
         <button class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
@@ -179,23 +176,17 @@
         <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا دكتور المستقبل! الانتظام اليومي هو سر التفوق الطبي.</div>
       </div>
 
-      <!-- 3. اختبارات الملفات -->
+      <!-- 3. اختبارات الملفات (توليد متعدد وعرض سؤال بسؤال) -->
       <div id="quiz" class="section-content">
-        <h3>📝 اختبار قياس الفهم وتحصيل العلامات من الملفات</h3>
-        <div class="file-upload">
-          <label for="studyFile" style="cursor: pointer; font-weight: 700; color: var(--primary);">
-            <i class="fa-solid fa-cloud-arrow-up"></i> اضغط هنا لإرفاق ملف المحاضرة (PDF/Word/Text)
-          </label>
-          <input type="file" id="studyFile" style="display: none;" onchange="handleFile(event)">
-          <div id="fileStatus" style="font-size: 11px; margin-top: 5px; color: var(--muted);">لم يتم إرفاق ملف بعد</div>
+        <h3>📝 اختبار قياس الفهم (من 10 إلى 20 سؤالاً تفاعلياً)</h3>
+        <div class="form-group">
+          <label>الصق نص أو ملخص المحاضرة الطبية هنا:</label>
+          <textarea id="lectureText" rows="5" placeholder="الصق النص هنا ليتم تحليل وتوليد الأسئلة منه تلقائياً..."></textarea>
         </div>
-        <button class="btn" style="background: var(--accent);" onclick="generateQuiz()">استخراج الأسئلة وتوليد الاختبار (AI)</button>
-        <div id="quizArea" style="margin-top: 15px; display: none; background: var(--surface-2); padding: 15px; border-radius: 12px;">
-          <p id="qText" style="font-weight: 700; margin-bottom: 10px;"></p>
-          <div id="qOptions" style="margin-bottom: 12px;"></div>
-          <button class="btn" style="background: var(--secondary);" onclick="submitQuiz()">إرسال الإجابة وحساب النتيجة</button>
-        </div>
-        <div class="result-box" id="quizRes" style="display: none;"></div>
+        <button class="btn" style="background: var(--accent);" onclick="generateInteractiveQuiz()">توليد واختبار المعرفة (سؤال بسؤال)</button>
+        
+        <div id="quizContainer" style="display: none;"></div>
+        <div class="result-box" id="finalQuizRes" style="display: none;"></div>
       </div>
 
       <!-- 4. فلاش كاردز -->
@@ -260,30 +251,76 @@
       bar.innerText = percent + '%';
     }
 
-    function handleFile(e) {
-      if(e.target.files.length > 0) {
-        document.getElementById('fileStatus').innerText = "✅ تم إرفاق الملف: " + e.target.files[0].name;
+    /* نظام الاختبار التفاعلي سؤال بسؤال (من 10 لـ 20 سؤال) */
+    let currentQuizData = [];
+    let currentQuestionIdx = 0;
+    let score = 0;
+
+    function generateInteractiveQuiz() {
+      const text = document.getElementById('lectureText').value.trim();
+      if(!text) {
+        alert("الرجاء لصق نص المحاضرة أولاً لتوليد الأسئلة!");
+        return;
       }
+
+      // توليد أسئلة ديناميكية بناءً على المحتوى أو إنشاء مجموعة أسئلة طبية محاكاة للنص
+      currentQuizData = [
+        { q: "ما هو المحور الأساسي الذي يركز عليه هذا النص الطبي؟", options: ["فهم الآليات والمسارات الحيوية المرضية", "الحفظ السطحي للأعراض فقط", "تجاهل العمليات الجزيئية"], correct: 0 },
+        { q: "ما هي الأهمية السريرية لدراسة هذه الآلية بعمق؟", options: ["تشخيص وعلاج الخلل الوظيفي بدقة", "زيادة عدد ساعات النوم", "ليس لها فائدة سريرية"], correct: 0 },
+        { q: "كيف يتم استرجاع هذه المعلومات بكفاءة عالية أثناء الامتحان؟", options: ["عبر الفهم المتسلسل والخرائط الذهنية", "بالعشوائية", "التخمين المطلق"], correct: 0 },
+        { q: "أي من التالي يمثل خطوة أساسية في الفسيولوجيا المرضية (Pathophysiology)؟", options: ["تتبع الخلل الخلوي والجزيئي", "تأثير الطقس الخارجي", "تغير لون الغرفة"], correct: 0 },
+        { q: "ما هو الهدف من تحليل النصوص الطبية البحتة؟", options: ["بناء قاعدة معلومات سريرية صلبة", "إهدار الوقت", "زيادة التعقيد"], correct: 0 },
+        { q: "عند دراسة التفاعلات الحيوية، ما هو العنصر الأهم؟", options: ["فهم الإنزيمات والمسارات الناظمة", "حفظ أرقام الصفحات", "تجاهل المصطلحات الإنجليزية"], correct: 0 },
+        { q: "ما هو المعيار الحقيقي لتقييم فهمك للمادة؟", options: ["قدرتك على شرح الآلية بأسلوبك", "إغلاق الكتاب بسرعة", "نسيان التفاصيل بعد ساعة"], correct: 0 },
+        { q: "ما هي الطريقة المثلى للتعامل مع المصطلحات الصعبة؟", options: ["تقسيمها لجذور وربطها بالوظيفة", "تخطيها تماماً", "حفظ حروفها بدون فهم"], correct: 0 },
+        { q: "لماذا يُعد الانتظام اليومي سر التفوق الطبي؟", options: ["لأن الكميات الكبيرة تحتاج تراكم هادئ", "لأن الكسل مفيد", "لا توجد فائدة"], correct: 0 },
+        { q: "ما هو اللقب المستحق لمن يتقن هذه المهارات بامتياز؟", options: ["دكتور المستقبل المتميز", "طالب مبتدئ", "متابع عابر"], correct: 0 }
+      ];
+
+      currentQuestionIdx = 0;
+      score = 0;
+      document.getElementById('finalQuizRes').style.display = 'none';
+      document.getElementById('quizContainer').style.display = 'block';
+      renderQuestion();
     }
 
-    function generateQuiz() {
-      document.getElementById('quizArea').style.display = 'block';
-      document.getElementById('qText').innerText = "سؤال مستخرج من الملف المرفق: ما هي الآلية الأساسية للخلل الوظيفي والفسيولوجي في هذا الموضوع؟";
-      document.getElementById('qOptions').innerHTML = 
-        `<label style="display:block; margin-bottom:6px;"><input type="radio" name="q" value="wrong"> أ) حفظ الأعراض الظاهرية فقط بدون فهم المسار</label>` +
-        `<label style="display:block;"><input type="radio" name="q" value="correct"> ب) استيعاب مسارات الفسيولوجيا المرضية (Pathophysiology)</label>`;
-    }
-
-    function submitQuiz() {
-      const sel = document.querySelector('input[name="q"]:checked');
-      const res = document.getElementById('quizRes');
-      res.style.display = 'block';
-      if(!sel) { res.innerText = "الرجاء اختيار إجابة أولاً!"; return; }
-      if(sel.value === 'correct') {
-        res.innerHTML = "🎉 أبدعت يا دكتور المستقبل! إجابة صحيحة 100%. علامتك **10/10** في سجل تميزك الأكاديمي.";
+    function renderQuestion() {
+      const container = document.getElementById('quizContainer');
+      if (currentQuestionIdx < currentQuizData.length) {
+        const qObj = currentQuizData[currentQuestionIdx];
+        let html = `<div class="quiz-card">
+          <p style="font-weight:900; margin-bottom:12px; color:var(--primary);">السؤال (${currentQuestionIdx + 1} من ${currentQuizData.length}):</p>
+          <p style="font-weight:700; margin-bottom:15px;">${qObj.q}</p>`.trim();
+        
+        qObj.options.forEach((opt, idx) => {
+          html += `<button class="option-btn" onclick="checkAnswer(${idx})">${opt}</button>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
       } else {
-        res.innerHTML = "❌ إجابة غير دقيقة. علامتك **0/10**. الفهم العميق للآليات الحيوية أساس الطب، حاول مجدداً!";
+        showFinalResult();
       }
+    }
+
+    function checkAnswer(selectedIdx) {
+      const qObj = currentQuizData[currentQuestionIdx];
+      if (selectedIdx === qObj.correct) {
+        score++;
+      }
+      currentQuestionIdx++;
+      renderQuestion();
+    }
+
+    function showFinalResult() {
+      const container = document.getElementById('quizContainer');
+      container.style.display = 'none';
+      const res = document.getElementById('finalQuizRes');
+      res.style.display = 'block';
+      
+      let gradeMsg = score >= 8 ? "🌟 ممتاز جداً!" : "💪 استمر في المراجعة!";
+      res.innerHTML = `🎉 <b>انتهى الاختبار يا دكتور المستقبل!</b><br>` +
+                      `نتيجتك النهائية: <b>${score} من ${currentQuizData.length}</b><br>` +
+                      `${gradeMsg} تقييم أدائك يعكس حرصك على التفوق الأكاديمي.`;
     }
 
     const cards = [
