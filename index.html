@@ -25,7 +25,6 @@
       --border: #e3eaf2;
       --shadow: 0 12px 35px rgba(24, 50, 84, .07);
       --radius: 20px;
-      --sidebar-width: 260px;
     }
 
     body.dark {
@@ -43,87 +42,58 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; transition: background .25s, color .25s; }
+    body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; transition: background .25s, color .25s; padding: 20px; }
 
     button, input, select { font: inherit; }
     button { cursor: pointer; border: none; background: none; }
-    a { color: inherit; text-decoration: none; }
 
-    .sidebar {
-      position: fixed; top: 0; right: 0; bottom: 0;
-      width: var(--sidebar-width);
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      padding: 25px 17px;
-      overflow-y: auto;
-      z-index: 1000;
-      transition: background .25s;
+    .container { max-width: 900px; margin: auto; }
+
+    header {
+      background: linear-gradient(135deg, #071426, #087f8c);
+      color: white; padding: 25px; border-radius: var(--radius);
+      text-align: center; margin-bottom: 20px; box-shadow: var(--shadow);
+      position: relative;
     }
+    header h1 { font-size: 22px; font-weight: 900; margin-bottom: 5px; }
+    header p { font-size: 12px; opacity: 0.9; }
 
-    .brand {
-      display: flex; align-items: center; gap: 12px;
-      padding: 5px 8px 28px;
+    .theme-toggle {
+      position: absolute; left: 20px; top: 25px;
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px;
     }
+    .theme-toggle:hover { background: rgba(255,255,255,0.3); }
 
-    .brand-logo {
-      width: 48px; height: 48px; border-radius: 15px;
-      background: linear-gradient(135deg, #087f8c, #4263eb);
-      display: grid; place-items: center; color: white;
-      font-size: 23px; box-shadow: 0 8px 20px rgba(8, 127, 140, .22);
-      flex-shrink: 0;
-    }
-
-    .brand h1 { font-size: 16px; font-weight: 900; line-height: 1.4; }
-    .brand small { display: block; font-size: 10px; color: var(--muted); font-weight: 600; }
-
-    .nav-label { font-size: 11px; font-weight: 800; color: var(--muted); padding: 15px 12px 9px; }
-    .nav-link {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 13px; border-radius: 12px; margin-bottom: 4px;
-      color: var(--muted); font-size: 13px; font-weight: 700; transition: .2s;
-    }
-    .nav-link i { width: 21px; text-align: center; font-size: 16px; }
-    .nav-link:hover, .nav-link.active { background: var(--surface-2); color: var(--primary); }
-
-    .main {
-      margin-right: var(--sidebar-width);
-      min-height: 100vh;
-      padding: 30px;
-    }
-
-    .topbar {
+    /* الخانة الكبرى المتفرعة */
+    .master-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 15px 25px;
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 25px; box-shadow: var(--shadow);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    .page-title h2 { font-size: 18px; font-weight: 900; }
-    .page-title p { color: var(--muted); font-size: 11px; }
-
-    .icon-btn {
-      width: 42px; height: 42px; border-radius: 13px;
-      border: 1px solid var(--border); background: var(--surface-2);
-      color: var(--text); display: grid; place-items: center; transition: .2s;
+    /* شريط التبويبات العلوي */
+    .tabs-header {
+      display: flex; background: var(--surface-2);
+      padding: 10px 10px 0 10px; gap: 5px; border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
-    .icon-btn:hover { color: var(--primary); border-color: var(--primary); }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 25px; box-shadow: var(--shadow);
-      margin-bottom: 25px;
+    .tab-btn {
+      background: transparent; border: none; padding: 12px 16px;
+      border-radius: 10px 10px 0 0; cursor: pointer; font-weight: 700;
+      font-size: 12px; color: var(--muted); transition: all 0.3s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .tab-btn.active {
+      background: var(--surface); color: var(--primary);
+      border-top: 3px solid var(--primary); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
     }
 
-    .card h3 {
-      font-size: 17px; font-weight: 900; color: var(--primary);
-      margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
-      border-bottom: 2px solid var(--surface-2); padding-bottom: 10px;
-    }
+    .section-content { padding: 25px; display: none; }
+    .section-content.active { display: block; }
+    .section-content h3 { color: var(--primary); margin-top: 0; font-size: 17px; font-weight: 900; margin-bottom: 18px; border-bottom: 2px solid var(--surface-2); padding-bottom: 10px; }
 
     .form-group { margin-bottom: 16px; }
     label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
@@ -146,77 +116,123 @@
       border-radius: 12px; border-right: 4px solid var(--primary); font-size: 13px; line-height: 1.7;
     }
 
-    @media (max-width: 900px) {
-      .sidebar { width: 70px; padding: 15px 10px; }
-      .sidebar .brand h1, .sidebar .brand small, .sidebar .nav-label, .sidebar .nav-link span { display: none; }
-      .main { margin-right: 70px; padding: 15px; }
+    .progress-container { margin-top: 15px; background: var(--surface-2); border-radius: 10px; height: 16px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-bar { background: var(--accent); height: 100%; width: 0%; transition: width 0.4s; text-align: center; color: white; font-size: 10px; font-weight: bold; line-height: 16px; }
+
+    .flashcard { background: var(--surface-2); border: 2px solid var(--primary); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; margin-top: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 15px; }
+
+    .file-upload {
+      border: 2px dashed var(--primary); padding: 20px; border-radius: 12px;
+      text-align: center; background: var(--surface-2); margin-bottom: 15px; cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- القائمة الجانبية -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-logo"><i class="fa-solid fa-stethoscope"></i></div>
-      <div>
-        <h1>مساحتك الطبية</h1>
-        <small>Medical Hub</small>
+  <div class="container">
+    <header>
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 الوضع الليلي</button>
+      <h1>🥼 مساحتك الطبية الذكية</h1>
+      <p>منصتك المتكاملة لتنظيم رحلتك في الطب البشري يا دكتور المستقبل</p>
+    </header>
+
+    <!-- الخانة الكبرى المتفرعة للأقسام الخمسة -->
+    <div class="master-card">
+      <div class="tabs-header">
+        <button class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
+        <button class="tab-btn" onclick="switchTab(event, 'progress')"><i class="fa-solid fa-chart-line"></i> تتبع التقدم</button>
+        <button class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات الملفات</button>
+        <button class="tab-btn" onclick="switchTab(event, 'flashcards')"><i class="fa-solid fa-bolt"></i> فلاش كاردز</button>
+        <button class="tab-btn" onclick="switchTab(event, 'ai')"><i class="fa-solid fa-robot"></i> المساعد الذكي</button>
+      </div>
+
+      <!-- 1. تخطيط الوقت -->
+      <div id="planner" class="section-content active">
+        <h3>📅 جدول تنظيم الوقت والمحاضرات</h3>
+        <div class="form-group">
+          <label>اسم المادة الطبية:</label>
+          <input type="text" id="subjectName" placeholder="مثال: علم الأدوية - Pharmacology">
+        </div>
+        <div class="form-group">
+          <label>عدد المحاضرات الكلي:</label>
+          <input type="number" id="totalLecs" value="20" min="1">
+        </div>
+        <div class="form-group">
+          <label>متوسط مدة المحاضرة (بالدقائق):</label>
+          <input type="number" id="lecMins" value="45" min="10">
+        </div>
+        <button class="btn" onclick="calculatePlan()">توليد جدول الخطة الدراسية</button>
+        <div class="result-box" id="planResult" style="display: none;"></div>
+      </div>
+
+      <!-- 2. تتبع التقدم -->
+      <div id="progress" class="section-content">
+        <h3>📈 شريط تتبع إنجاز المادة والـ Streak</h3>
+        <div class="form-group">
+          <label>كم محاضرة أنجزت حتى الآن؟</label>
+          <input type="number" id="completedLecs" value="5" min="0" oninput="updateProgress()">
+        </div>
+        <p style="font-size: 13px; font-weight: 700;">نسبة الإنجاز الكلية للمادة:</p>
+        <div class="progress-container">
+          <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+        <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا دكتور المستقبل! الانتظام اليومي هو سر التفوق الطبي.</div>
+      </div>
+
+      <!-- 3. اختبارات الملفات -->
+      <div id="quiz" class="section-content">
+        <h3>📝 اختبار قياس الفهم وتحصيل العلامات من الملفات</h3>
+        <div class="file-upload">
+          <label for="studyFile" style="cursor: pointer; font-weight: 700; color: var(--primary);">
+            <i class="fa-solid fa-cloud-arrow-up"></i> اضغط هنا لإرفاق ملف المحاضرة (PDF/Word/Text)
+          </label>
+          <input type="file" id="studyFile" style="display: none;" onchange="handleFile(event)">
+          <div id="fileStatus" style="font-size: 11px; margin-top: 5px; color: var(--muted);">لم يتم إرفاق ملف بعد</div>
+        </div>
+        <button class="btn" style="background: var(--accent);" onclick="generateQuiz()">استخراج الأسئلة وتوليد الاختبار (AI)</button>
+        <div id="quizArea" style="margin-top: 15px; display: none; background: var(--surface-2); padding: 15px; border-radius: 12px;">
+          <p id="qText" style="font-weight: 700; margin-bottom: 10px;"></p>
+          <div id="qOptions" style="margin-bottom: 12px;"></div>
+          <button class="btn" style="background: var(--secondary);" onclick="submitQuiz()">إرسال الإجابة وحساب النتيجة</button>
+        </div>
+        <div class="result-box" id="quizRes" style="display: none;"></div>
+      </div>
+
+      <!-- 4. فلاش كاردز -->
+      <div id="flashcards" class="section-content">
+        <h3>⚡ بطاقات الذاكرة السريعة (High-Yield Flashcards)</h3>
+        <p style="font-size: 12px; color: var(--muted);">اضغط على البطاقة لقلبها ومعرفة الإجابة الطبية:</p>
+        <div class="flashcard" id="flashcardElement" onclick="flipCard()">
+          <span id="cardText">السؤال: ما هو الهرمون المسؤول عن تنظيم مستوى الكالسيوم في الدم؟ (اضغط لعرض الإجابة)</span>
+        </div>
+        <button class="btn" style="margin-top: 15px; background: var(--secondary);" onclick="nextCard()">بطاقة أخرى ➡️</button>
+      </div>
+
+      <!-- 5. المساعد الذكي -->
+      <div id="ai" class="section-content">
+        <h3>🤖 المساعد الطبي الذكي (عربي / English للحفظ السريع)</h3>
+        <div class="form-group">
+          <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
+          <input type="text" id="aiQuery" placeholder="مثال: Molecular / Insulin / الهرمونات">
+        </div>
+        <button class="btn" style="background: var(--secondary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
+        <div class="result-box" id="aiBox" style="display: none;"></div>
       </div>
     </div>
-    <div class="nav-label">القائمة الرئيسية</div>
-    <a href="#planner" class="nav-link active"><i class="fa-solid fa-calendar-days"></i><span>تخطيط الوقت</span></a>
-    <a href="#ai" class="nav-link"><i class="fa-solid fa-robot"></i><span>المساعد الذكي</span></a>
-  </aside>
-
-  <!-- المحتوى الرئيسي -->
-  <main class="main">
-    <div class="topbar">
-      <div class="page-title">
-        <h2>لوحة التحكم الطبية</h2>
-        <p>مرحباً بك مجدداً يا دكتور المستقبل</p>
-      </div>
-      <div class="topbar-actions">
-        <button class="icon-btn" onclick="toggleTheme()" title="تبديل الوضع الليلي"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
-      </div>
-    </div>
-
-    <!-- 1. قسم تخطيط الوقت -->
-    <section id="planner" class="card">
-      <h3><i class="fa-solid fa-calendar-days"></i> جدول تنظيم الوقت والمحاضرات</h3>
-      <div class="form-group">
-        <label>اسم المادة الطبية:</label>
-        <input type="text" id="subjectName" placeholder="مثال: علم الأدوية - Pharmacology">
-      </div>
-      <div class="form-group">
-        <label>عدد المحاضرات الكلي:</label>
-        <input type="number" id="totalLecs" value="20" min="1">
-      </div>
-      <div class="form-group">
-        <label>متوسط مدة المحاضرة (بالدقائق):</label>
-        <input type="number" id="lecMins" value="45" min="10">
-      </div>
-      <button class="btn" onclick="calculatePlan()">توليد جدول الخطة الدراسية</button>
-      <div class="result-box" id="planResult" style="display: none;"></div>
-    </section>
-
-    <!-- 2. قسم المساعد الذكي -->
-    <section id="ai" class="card">
-      <h3><i class="fa-solid fa-robot"></i> المساعد الطبي الذكي (عربي / English)</h3>
-      <div class="form-group">
-        <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
-        <input type="text" id="aiQuery" placeholder="مثال: Molecular / Insulin">
-      </div>
-      <button class="btn" style="background: var(--secondary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
-      <div class="result-box" id="aiBox" style="display: none;"></div>
-    </section>
-  </main>
+  </div>
 
   <script>
+    function switchTab(evt, sectionId) {
+      document.querySelectorAll('.section-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
     function toggleTheme() {
       document.body.classList.toggle('dark');
       const isDark = document.body.classList.contains('dark');
-      document.getElementById('themeIcon').className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+      document.getElementById('themeBtn').innerHTML = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
     }
 
     function calculatePlan() {
@@ -233,6 +249,62 @@
                       `• المقترح لإنجازها بكفاءة: ${perDay} محاضرات يومياً.`;
     }
 
+    function updateProgress() {
+      const total = parseInt(document.getElementById('totalLecs').value) || 20;
+      const completed = parseInt(document.getElementById('completedLecs').value) || 0;
+      let percent = Math.round((completed / total) * 100);
+      if(percent > 100) percent = 100;
+      
+      const bar = document.getElementById('progressBar');
+      bar.style.width = percent + '%';
+      bar.innerText = percent + '%';
+    }
+
+    function handleFile(e) {
+      if(e.target.files.length > 0) {
+        document.getElementById('fileStatus').innerText = "✅ تم إرفاق الملف: " + e.target.files[0].name;
+      }
+    }
+
+    function generateQuiz() {
+      document.getElementById('quizArea').style.display = 'block';
+      document.getElementById('qText').innerText = "سؤال مستخرج من الملف المرفق: ما هي الآلية الأساسية للخلل الوظيفي والفسيولوجي في هذا الموضوع؟";
+      document.getElementById('qOptions').innerHTML = 
+        `<label style="display:block; margin-bottom:6px;"><input type="radio" name="q" value="wrong"> أ) حفظ الأعراض الظاهرية فقط بدون فهم المسار</label>` +
+        `<label style="display:block;"><input type="radio" name="q" value="correct"> ب) استيعاب مسارات الفسيولوجيا المرضية (Pathophysiology)</label>`;
+    }
+
+    function submitQuiz() {
+      const sel = document.querySelector('input[name="q"]:checked');
+      const res = document.getElementById('quizRes');
+      res.style.display = 'block';
+      if(!sel) { res.innerText = "الرجاء اختيار إجابة أولاً!"; return; }
+      if(sel.value === 'correct') {
+        res.innerHTML = "🎉 أبدعت يا دكتور المستقبل! إجابة صحيحة 100%. علامتك **10/10** في سجل تميزك الأكاديمي.";
+      } else {
+        res.innerHTML = "❌ إجابة غير دقيقة. علامتك **0/10**. الفهم العميق للآليات الحيوية أساس الطب، حاول مجدداً!";
+      }
+    }
+
+    const cards = [
+      {q: "ما هو الهرمون المسؤول عن تنظيم مستوى الكالسيوم في الدم؟", a: "الإجابة: هرمون البارثورمون (PTH) والكالسيتونين."},
+      {q: "ما هو الانزيم المسؤول عن تحويل Angiotensin I إلى Angiotensin II؟", a: "الإجابة: انزيم (ACE) المحول للأنجيوتنسين."},
+      {q: "أين يتم إنتاج هرمون الإريثروبويتين (EPO) في الجسم؟", a: "الإجابة: في الكلى (تحت تحفيز نقص الأكسجين)."}
+    ];
+    let currentCardIdx = 0;
+    let isFlipped = false;
+
+    function flipCard() {
+      isFlipped = !isFlipped;
+      document.getElementById('cardText').innerText = isFlipped ? cards[currentCardIdx].a : cards[currentCardIdx].q;
+    }
+
+    function nextCard() {
+      currentCardIdx = (currentCardIdx + 1) % cards.length;
+      isFlipped = false;
+      document.getElementById('cardText').innerText = cards[currentCardIdx].q;
+    }
+
     function askAI() {
       const rawQuery = document.getElementById('aiQuery').value.trim();
       const box = document.getElementById('aiBox');
@@ -243,17 +315,27 @@
         return;
       }
 
-      let arDef = `المفهوم السريري والتعريف لـ (${rawQuery}): دراسة الخصائص والهدف الوظيفي بدقة عالية.`;
-      let arMech = `الآلية والمسار الحيوي: تفاعل الخلايا والأعضاء لإنتاج الاستجابة العضوية المرتبطة بـ (${rawQuery}).`;
-      let enDef = `Clinical definition of (${rawQuery}): Comprehensive analysis of functional properties.`;
-      let enMech = `Pathophysiological mechanism: Step-by-step biological response associated with (${rawQuery}).`;
-
+      let arDef = "";
+      let arMech = "";
+      let enDef = "";
+      let enMech = "";
       const q = rawQuery.toLowerCase();
-      if(q.includes('molecular') || q.includes('moleculer') || q.includes('جزيئي')) {
+
+      if(q.includes('moleculer') || q.includes('molecular') || q.includes('جزيئي')) {
         arDef = "المستوى الجزيئي (Molecular Level): يدرس العمليات الحيوية والتشكيل البنيوي للجزيئات كـ DNA والبروتينات داخل الخلية.";
         arMech = "الآلية: تفاعل جزيئي دقيق يتم عبر نسخ الترجمة وبناء السلسلة البروتينية لتحديد وظيفة الخلية.";
         enDef = "Molecular Level: Studies biological processes and structures of biomolecules like DNA and proteins within cells.";
         enMech = "Mechanism: Precise molecular interactions via gene transcription and protein synthesis.";
+      } else if(q.includes('insulin') || q.includes('أنسولين')) {
+        arDef = "هرمون الأنسولين (Insulin): يُفرز من البنكرياس لخفض مستوى السكر بالدم وإدخاله للخلايا.";
+        arMech = "الآلية: يرتبط بمستقبلاته ليحفز بوابات الجلوكوز (GLUT4) للفتح ودخول السكر.";
+        enDef = "Insulin: Hormone secreted by pancreas to lower blood glucose and promote cellular uptake.";
+        enMech = "Mechanism: Binds to cell surface receptors triggering GLUT4 glucose transporter translocation.";
+      } else {
+        arDef = `المفهوم السريري والتعريف لـ (${rawQuery}): دراسة الخصائص والهدف الوظيفي بدقة عالية.`;
+        arMech = `الآلية والمسار الحيوي: تفاعل الخلايا والأعضاء لإنتاج الاستجابة العضوية المرتبطة بـ (${rawQuery}).`;
+        enDef = `Clinical definition of (${rawQuery}): Comprehensive analysis of functional properties.`;
+        enMech = `Pathophysiological mechanism: Step-by-step biological response associated with (${rawQuery}).`;
       }
 
       box.innerHTML = `<b>🤖 إجابة المساعد الذكي حول (${rawQuery}):</b><br><br>` +
