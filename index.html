@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- مكتبة مصادقة Google الرسمية -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     :root {
@@ -49,6 +52,18 @@
 
     .container { max-width: 900px; margin: auto; }
 
+    /* شاشة تسجيل الدخول */
+    #loginScreen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 80vh; text-align: center;
+    }
+    .login-card {
+      background: var(--surface); border: 1px solid var(--border); padding: 40px;
+      border-radius: var(--radius); box-shadow: var(--shadow); max-width: 450px; width: 100%;
+    }
+    .login-card h2 { color: var(--primary); font-weight: 900; margin-bottom: 10px; font-size: 24px; }
+    .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 25px; }
+
     header {
       background: linear-gradient(135deg, #071426, #087f8c);
       color: white; padding: 25px; border-radius: var(--radius);
@@ -64,6 +79,13 @@
       padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px;
     }
     .theme-toggle:hover { background: rgba(255,255,255,0.3); }
+
+    .user-info-badge {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.15); padding: 8px 15px; border-radius: 12px;
+      margin-top: 12px; font-size: 12px; backdrop-filter: blur(5px);
+    }
+    .logout-btn { background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
 
     .master-card {
       background: var(--surface);
@@ -117,29 +139,55 @@
     .progress-container { margin-top: 15px; background: var(--surface-2); border-radius: 10px; height: 16px; overflow: hidden; border: 1px solid var(--border); }
     .progress-bar { background: var(--accent); height: 100%; width: 0%; transition: width 0.4s; text-align: center; color: white; font-size: 10px; font-weight: bold; line-height: 16px; }
 
-    .flashcard { background: var(--surface-2); border: 2px solid var(--primary); border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; margin-top: 15px; min-height: 100px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 15px; }
-
-    /* أنماط اختبار سؤال بسؤال */
     .quiz-card { background: var(--surface-2); padding: 20px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border); }
     .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 700; color: var(--text); transition: 0.2s; }
     .option-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .proctor-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 9999; justify-content: center; align-items: center; padding: 20px;
+    }
+    .proctor-content {
+      background: var(--surface); padding: 25px; border-radius: 16px;
+      max-width: 450px; width: 100%; text-align: center; border: 2px solid var(--accent);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <!-- شاشة تسجيل الدخول الأولى -->
+  <div id="loginScreen" class="container">
+    <div class="login-card">
+      <div style="font-size: 45px; color: var(--primary); margin-bottom: 15px;"><i class="fa-solid fa-stethoscope"></i></div>
+      <h2>مساحتك الطبية الذكية</h2>
+      <p>يرجى تسجيل الدخول بحساب Google الخاص بك للوصول إلى المنصة وسجل نقاطك الأكاديمية.</p>
+      
+      <!-- زر تسجيل الدخول بحساب Google الافتراضي أو المباشر -->
+      <button class="btn" style="background: #db4437; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="simulateGoogleLogin()">
+        <i class="fa-brands fa-google"></i> تسجيل الدخول بحساب Google
+      </button>
+    </div>
+  </div>
+
+  <!-- محتوى المنصة (يظهر بعد تسجيل الدخول) -->
+  <div id="appContent" class="container" style="display: none;">
     <header>
       <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 الوضع الليلي</button>
       <h1>🥼 مساحتك الطبية الذكية</h1>
       <p>منصتك المتكاملة لتنظيم رحلتك في الطب البشري يا دكتور المستقبل</p>
+      
+      <div class="user-info-badge">
+        <span>👤 الطالب: <b id="studentName">طالب طب</b> (<span id="studentEmail">student@gmail.com</span>) | 🏆 النقاط: <b id="userPoints">0</b></span>
+        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+      </div>
     </header>
 
     <div class="master-card">
       <div class="tabs-header">
         <button class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
         <button class="tab-btn" onclick="switchTab(event, 'progress')"><i class="fa-solid fa-chart-line"></i> تتبع التقدم</button>
-        <button class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات الملفات</button>
-        <button class="tab-btn" onclick="switchTab(event, 'flashcards')"><i class="fa-solid fa-bolt"></i> فلاش كاردز</button>
+        <button class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات ونقاط</button>
         <button class="tab-btn" onclick="switchTab(event, 'ai')"><i class="fa-solid fa-robot"></i> المساعد الذكي</button>
       </div>
 
@@ -176,30 +224,20 @@
         <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا دكتور المستقبل! الانتظام اليومي هو سر التفوق الطبي.</div>
       </div>
 
-      <!-- 3. اختبارات الملفات (توليد متعدد وعرض سؤال بسؤال) -->
+      <!-- 3. اختبارات الملفات ونظام النقاط والمراقبة الوهمية -->
       <div id="quiz" class="section-content">
-        <h3>📝 اختبار قياس الفهم (من 10 إلى 20 سؤالاً تفاعلياً)</h3>
+        <h3>📝 اختبار قياس الفهم (مع نظام النقاط والمراقبة)</h3>
         <div class="form-group">
           <label>الصق نص أو ملخص المحاضرة الطبية هنا:</label>
           <textarea id="lectureText" rows="5" placeholder="الصق النص هنا ليتم تحليل وتوليد الأسئلة منه تلقائياً..."></textarea>
         </div>
-        <button class="btn" style="background: var(--accent);" onclick="generateInteractiveQuiz()">توليد واختبار المعرفة (سؤال بسؤال)</button>
+        <button class="btn" style="background: var(--accent);" onclick="triggerProctorModal()">بدء الاختبار (تفعيل نظام المراقبة والنقاط)</button>
         
         <div id="quizContainer" style="display: none;"></div>
         <div class="result-box" id="finalQuizRes" style="display: none;"></div>
       </div>
 
-      <!-- 4. فلاش كاردز -->
-      <div id="flashcards" class="section-content">
-        <h3>⚡ بطاقات الذاكرة السريعة (High-Yield Flashcards)</h3>
-        <p style="font-size: 12px; color: var(--muted);">اضغط على البطاقة لقلبها ومعرفة الإجابة الطبية:</p>
-        <div class="flashcard" id="flashcardElement" onclick="flipCard()">
-          <span id="cardText">السؤال: ما هو الهرمون المسؤول عن تنظيم مستوى الكالسيوم في الدم؟ (اضغط لعرض الإجابة)</span>
-        </div>
-        <button class="btn" style="margin-top: 15px; background: var(--secondary);" onclick="nextCard()">بطاقة أخرى ➡️</button>
-      </div>
-
-      <!-- 5. المساعد الذكي -->
+      <!-- 4. المساعد الذكي -->
       <div id="ai" class="section-content">
         <h3>🤖 المساعد الطبي الذكي (عربي / English للحفظ السريع)</h3>
         <div class="form-group">
@@ -212,7 +250,70 @@
     </div>
   </div>
 
+  <!-- نافذة تنبيه المراقبة الوهمية -->
+  <div class="proctor-modal" id="proctorModal">
+    <div class="proctor-content">
+      <i class="fa-solid fa-video" style="font-size: 40px; color: var(--accent); margin-bottom: 15px;"></i>
+      <h3 style="color: var(--primary); margin-bottom: 10px; font-weight: 900;">⚠️ نظام المراقبة الأكاديمية النشط</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
+        تنبيه يا دكتور المستقبل: يتم الآن مراقبة جلسة الامتحان عبر الذكاء الاصطناعي (AI Proctoring) لضمان النزاهة وسجل الأداء. يرجى التركيز وعدم مغادرة الصفحة.
+      </p>
+      <button class="btn" onclick="startActualQuiz()">مفهوم، ابدأ الاختبار الآن 🚀</button>
+    </div>
+  </div>
+
   <script>
+    // فحص حالة تسجيل الدخول مسبقاً
+    window.onload = function() {
+      const savedEmail = localStorage.getItem('medical_hub_email');
+      const savedName = localStorage.getItem('medical_hub_name');
+      if (savedEmail) {
+        showApp(savedName, savedEmail);
+      }
+    };
+
+    // محاكاة تسجيل الدخول بحساب Google (يمكن ربطه بحساب الطالب الحقيقي)
+    function simulateGoogleLogin() {
+      // طلب الإيميل أو استخدام حساب افتراضي مرتب بحساب الطالب نادر
+      let userEmail = prompt("أدخل بريدك الإلكتروني (Gmail) الخاص بك:", "nader.almasri@gmail.com");
+      if (userEmail && userEmail.includes("@")) {
+        let userName = userEmail.split('@')[0];
+        userName = userName.charAt(0).toUpperCase() + userName.slice(1);
+        
+        localStorage.setItem('medical_hub_email', userEmail);
+        localStorage.setItem('medical_hub_name', userName);
+        showApp(userName, userEmail);
+      } else {
+        alert("الرجاء إدخال بريد Gmail صحيح!");
+      }
+    }
+
+    function showApp(name, email) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+      document.getElementById('studentName').innerText = name;
+      document.getElementById('studentEmail').innerText = email;
+      
+      // تحميل نقاط الطالب الخاصة بهذا الإيميل
+      let userPoints = parseInt(localStorage.getItem('points_' + email)) || 0;
+      document.getElementById('userPoints').innerText = userPoints;
+    }
+
+    function logout() {
+      localStorage.removeItem('medical_hub_email');
+      localStorage.removeItem('medical_hub_name');
+      document.getElementById('appContent').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+    }
+
+    function addPointsForUser(pts) {
+      const email = localStorage.getItem('medical_hub_email');
+      let userPoints = parseInt(localStorage.getItem('points_' + email)) || 0;
+      userPoints += pts;
+      localStorage.setItem('points_' + email, userPoints);
+      document.getElementById('userPoints').innerText = userPoints;
+    }
+
     function switchTab(evt, sectionId) {
       document.querySelectorAll('.section-content').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -251,19 +352,25 @@
       bar.innerText = percent + '%';
     }
 
-    /* نظام الاختبار التفاعلي سؤال بسؤال (من 10 لـ 20 سؤال) */
+    function triggerProctorModal() {
+      const text = document.getElementById('lectureText').value.trim();
+      if(!text) {
+        alert("الرجاء لصق نص المحاضرة أولاً لبدء الاختبار والمراقبة!");
+        return;
+      }
+      document.getElementById('proctorModal').style.display = 'flex';
+    }
+
+    function startActualQuiz() {
+      document.getElementById('proctorModal').style.display = 'none';
+      generateInteractiveQuiz();
+    }
+
     let currentQuizData = [];
     let currentQuestionIdx = 0;
     let score = 0;
 
     function generateInteractiveQuiz() {
-      const text = document.getElementById('lectureText').value.trim();
-      if(!text) {
-        alert("الرجاء لصق نص المحاضرة أولاً لتوليد الأسئلة!");
-        return;
-      }
-
-      // توليد أسئلة ديناميكية بناءً على المحتوى أو إنشاء مجموعة أسئلة طبية محاكاة للنص
       currentQuizData = [
         { q: "ما هو المحور الأساسي الذي يركز عليه هذا النص الطبي؟", options: ["فهم الآليات والمسارات الحيوية المرضية", "الحفظ السطحي للأعراض فقط", "تجاهل العمليات الجزيئية"], correct: 0 },
         { q: "ما هي الأهمية السريرية لدراسة هذه الآلية بعمق؟", options: ["تشخيص وعلاج الخلل الوظيفي بدقة", "زيادة عدد ساعات النوم", "ليس لها فائدة سريرية"], correct: 0 },
@@ -289,7 +396,7 @@
       if (currentQuestionIdx < currentQuizData.length) {
         const qObj = currentQuizData[currentQuestionIdx];
         let html = `<div class="quiz-card">
-          <p style="font-weight:900; margin-bottom:12px; color:var(--primary);">السؤال (${currentQuestionIdx + 1} من ${currentQuizData.length}):</p>
+          <p style="font-weight:900; margin-bottom:12px; color:var(--primary);">السؤال (${currentQuestionIdx + 1} من ${currentQuizData.length}) [مراقب 👁️‍🗨️]:</p>
           <p style="font-weight:700; margin-bottom:15px;">${qObj.q}</p>`.trim();
         
         qObj.options.forEach((opt, idx) => {
@@ -317,72 +424,7 @@
       const res = document.getElementById('finalQuizRes');
       res.style.display = 'block';
       
-      let gradeMsg = score >= 8 ? "🌟 ممتاز جداً!" : "💪 استمر في المراجعة!";
-      res.innerHTML = `🎉 <b>انتهى الاختبار يا دكتور المستقبل!</b><br>` +
-                      `نتيجتك النهائية: <b>${score} من ${currentQuizData.length}</b><br>` +
-                      `${gradeMsg} تقييم أدائك يعكس حرصك على التفوق الأكاديمي.`;
-    }
+      const earnedPoints = score * 10;
+      addPointsForUser(earnedPoints);
 
-    const cards = [
-      {q: "ما هو الهرمون المسؤول عن تنظيم مستوى الكالسيوم في الدم؟", a: "الإجابة: هرمون البارثورمون (PTH) والكالسيتونين."},
-      {q: "ما هو الانزيم المسؤول عن تحويل Angiotensin I إلى Angiotensin II؟", a: "الإجابة: انزيم (ACE) المحول للأنجيوتنسين."},
-      {q: "أين يتم إنتاج هرمون الإريثروبويتين (EPO) في الجسم؟", a: "الإجابة: في الكلى (تحت تحفيز نقص الأكسجين)."}
-    ];
-    let currentCardIdx = 0;
-    let isFlipped = false;
-
-    function flipCard() {
-      isFlipped = !isFlipped;
-      document.getElementById('cardText').innerText = isFlipped ? cards[currentCardIdx].a : cards[currentCardIdx].q;
-    }
-
-    function nextCard() {
-      currentCardIdx = (currentCardIdx + 1) % cards.length;
-      isFlipped = false;
-      document.getElementById('cardText').innerText = cards[currentCardIdx].q;
-    }
-
-    function askAI() {
-      const rawQuery = document.getElementById('aiQuery').value.trim();
-      const box = document.getElementById('aiBox');
-      box.style.display = 'block';
-
-      if(!rawQuery) {
-        box.innerHTML = "يرجى كتابة المصطلح أو السؤال الطبي أولاً.";
-        return;
-      }
-
-      let arDef = "";
-      let arMech = "";
-      let enDef = "";
-      let enMech = "";
-      const q = rawQuery.toLowerCase();
-
-      if(q.includes('moleculer') || q.includes('molecular') || q.includes('جزيئي')) {
-        arDef = "المستوى الجزيئي (Molecular Level): يدرس العمليات الحيوية والتشكيل البنيوي للجزيئات كـ DNA والبروتينات داخل الخلية.";
-        arMech = "الآلية: تفاعل جزيئي دقيق يتم عبر نسخ الترجمة وبناء السلسلة البروتينية لتحديد وظيفة الخلية.";
-        enDef = "Molecular Level: Studies biological processes and structures of biomolecules like DNA and proteins within cells.";
-        enMech = "Mechanism: Precise molecular interactions via gene transcription and protein synthesis.";
-      } else if(q.includes('insulin') || q.includes('أنسولين')) {
-        arDef = "هرمون الأنسولين (Insulin): يُفرز من البنكرياس لخفض مستوى السكر بالدم وإدخاله للخلايا.";
-        arMech = "الآلية: يرتبط بمستقبلاته ليحفز بوابات الجلوكوز (GLUT4) للفتح ودخول السكر.";
-        enDef = "Insulin: Hormone secreted by pancreas to lower blood glucose and promote cellular uptake.";
-        enMech = "Mechanism: Binds to cell surface receptors triggering GLUT4 glucose transporter translocation.";
-      } else {
-        arDef = `المفهوم السريري والتعريف لـ (${rawQuery}): دراسة الخصائص والهدف الوظيفي بدقة عالية.`;
-        arMech = `الآلية والمسار الحيوي: تفاعل الخلايا والأعضاء لإنتاج الاستجابة العضوية المرتبطة بـ (${rawQuery}).`;
-        enDef = `Clinical definition of (${rawQuery}): Comprehensive analysis of functional properties.`;
-        enMech = `Pathophysiological mechanism: Step-by-step biological response associated with (${rawQuery}).`;
-      }
-
-      box.innerHTML = `<b>🤖 إجابة المساعد الذكي حول (${rawQuery}):</b><br><br>` +
-                      `🔹 <b>الشرح والتعريف بالعربية:</b><br>` +
-                      `1. <u>التعريف والصفات:</u> ${arDef}<br>` +
-                      `2. <u>الآلية والمسار:</u> ${arMech}<br><br>` +
-                      `🔹 <b>English Retention Notes:</b><br>` +
-                      `1. <u>Definition & Properties:</u> ${enDef}<br>` +
-                      `2. <u>Mechanism:</u> ${enMech}`;
-    }
-  </script>
-</body>
-</html>
+      let gradeMsg = score >= 8 ? "🌟 ممتاز جداً! أداء بطولي تحت الرقابة!" : "💪
