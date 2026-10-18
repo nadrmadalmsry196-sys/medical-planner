@@ -1,918 +1,269 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#20194c">
-<meta name="description" content="مساحتك الطبية: منصة تعليمية لتنظيم مواد الطب البشري والوصول إلى المصادر الطبية.">
-<title>مساحتك الطبية 🩺</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071426">
+  <title>مساحتك الطبية | Medical Study Hub</title>
 
-<style>
-:root {
-  --bg: #f5f6fc;
-  --card: #ffffff;
-  --ink: #20213b;
-  --muted: #6b7089;
-  --line: #e4e6f1;
-  --primary: #6157d9;
-  --secondary: #1cae9c;
-}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-[data-theme="dark"] {
-  --bg: #101222;
-  --card: #191c31;
-  --ink: #f2f3ff;
-  --muted: #b2b7d1;
-  --line: #30344e;
-  --primary: #aaa2ff;
-  --secondary: #54d6c1;
-}
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-2: #edf3f9;
+      --text: #15243b;
+      --muted: #718096;
+      --primary: #087f8c;
+      --primary-dark: #056570;
+      --secondary: #4263eb;
+      --accent: #11b8a6;
+      --border: #e3eaf2;
+      --shadow: 0 12px 35px rgba(24, 50, 84, .07);
+      --radius: 20px;
+      --sidebar-width: 260px;
+    }
 
-* {
-  box-sizing: border-box;
-}
+    body.dark {
+      --bg: #08111f;
+      --surface: #101d2e;
+      --surface-2: #17263a;
+      --text: #e9f0fb;
+      --muted: #a0b0c6;
+      --primary: #32c7c7;
+      --primary-dark: #1ba5ac;
+      --secondary: #8ca6ff;
+      --accent: #39d6b2;
+      --border: #26364b;
+      --shadow: 0 12px 35px rgba(0, 0, 0, .16);
+    }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Tahoma, Arial, sans-serif;
-  line-height: 1.8;
-  transition: background 0.3s, color 0.3s;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; transition: background .25s, color .25s; }
 
-button, input, select {
-  font: inherit;
-}
+    button, input, select { font: inherit; }
+    button { cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
 
-button {
-  cursor: pointer;
-}
+    .sidebar {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      padding: 25px 17px;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: background .25s;
+    }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 16px;
-}
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      padding: 5px 8px 28px;
+    }
 
-.hero {
-  padding: 32px;
-  border-radius: 24px;
-  color: white;
-  background: linear-gradient(
-    125deg,
-    #20194c,
-    #6157d9 60%,
-    #1cae9c
-  );
-  box-shadow: 0 12px 35px #352c7922;
-}
+    .brand-logo {
+      width: 48px; height: 48px; border-radius: 15px;
+      background: linear-gradient(135deg, #087f8c, #4263eb);
+      display: grid; place-items: center; color: white;
+      font-size: 23px; box-shadow: 0 8px 20px rgba(8, 127, 140, .22);
+      flex-shrink: 0;
+    }
 
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
+    .brand h1 { font-size: 16px; font-weight: 900; line-height: 1.4; }
+    .brand small { display: block; font-size: 10px; color: var(--muted); font-weight: 600; }
 
-.hero h1 {
-  margin: 5px 0;
-  font-size: clamp(28px, 5vw, 44px);
-}
+    .nav-label { font-size: 11px; font-weight: 800; color: var(--muted); padding: 15px 12px 9px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 13px; border-radius: 12px; margin-bottom: 4px;
+      color: var(--muted); font-size: 13px; font-weight: 700; transition: .2s;
+    }
+    .nav-link i { width: 21px; text-align: center; font-size: 16px; }
+    .nav-link:hover, .nav-link.active { background: var(--surface-2); color: var(--primary); }
 
-.hero p {
-  margin-bottom: 0;
-}
+    .main {
+      margin-right: var(--sidebar-width);
+      min-height: 100vh;
+      padding: 30px;
+    }
 
-.btn {
-  border: 0;
-  border-radius: 12px;
-  padding: 11px 16px;
-  font-weight: bold;
-  transition: 0.2s;
-}
+    .topbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 15px 25px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 25px; box-shadow: var(--shadow);
+    }
 
-.btn:hover {
-  transform: translateY(-2px);
-}
+    .page-title h2 { font-size: 18px; font-weight: 900; }
+    .page-title p { color: var(--muted); font-size: 11px; }
 
-.light-btn {
-  background: #ffffff22;
-  color: white;
-  border: 1px solid #ffffff66;
-}
+    .icon-btn {
+      width: 42px; height: 42px; border-radius: 13px;
+      border: 1px solid var(--border); background: var(--surface-2);
+      color: var(--text); display: grid; place-items: center; transition: .2s;
+    }
+    .icon-btn:hover { color: var(--primary); border-color: var(--primary); }
 
-.primary-btn {
-  background: var(--primary);
-  color: white;
-}
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 25px; box-shadow: var(--shadow);
+      margin-bottom: 25px;
+    }
 
-.toolbar {
-  display: grid;
-  grid-template-columns: 1fr 210px auto;
-  gap: 10px;
-  margin: 22px 0;
-}
+    .card h3 {
+      font-size: 17px; font-weight: 900; color: var(--primary);
+      margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+      border-bottom: 2px solid var(--surface-2); padding-bottom: 10px;
+    }
 
-.field {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--card);
-  color: var(--ink);
-  outline: none;
-}
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; padding: 12px; border: 1px solid var(--border);
+      border-radius: 12px; background: var(--surface-2); color: var(--text);
+      outline: none; font-family: "Cairo", sans-serif;
+    }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(8,127,140,.08); }
 
-.field:focus {
-  border-color: var(--primary);
-}
+    .btn {
+      background: var(--primary); color: white; border: none;
+      padding: 12px 20px; border-radius: 12px; font-family: "Cairo", sans-serif;
+      font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
 
-.pills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
+    .result-box {
+      margin-top: 15px; padding: 16px; background: var(--surface-2);
+      border-radius: 12px; border-right: 4px solid var(--primary); font-size: 13px; line-height: 1.7;
+    }
 
-.pill {
-  border: 1px solid var(--line);
-  border-radius: 30px;
-  padding: 8px 15px;
-  background: var(--card);
-  color: var(--ink);
-}
-
-.pill.active {
-  background: var(--primary);
-  color: white;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 16px;
-}
-
-.panel,
-.course,
-.detail {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 18px;
-}
-
-.side {
-  height: max-content;
-}
-
-.year {
-  display: block;
-  width: 100%;
-  text-align: right;
-  background: transparent;
-  border: 0;
-  border-radius: 10px;
-  color: var(--ink);
-  padding: 11px;
-  margin: 4px 0;
-}
-
-.year:hover {
-  background: var(--bg);
-}
-
-.year.active {
-  background: var(--primary);
-  color: white;
-}
-
-.head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.head h2 {
-  margin: 5px 0;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 18px;
-}
-
-.course {
-  cursor: pointer;
-  border-top: 4px solid var(--accent, #6157d9);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.course:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px #0000000c;
-}
-
-.course h3 {
-  margin: 5px 0;
-  font-size: 17px;
-}
-
-.muted {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.badge {
-  display: inline-block;
-  font-size: 11px;
-  background: var(--bg);
-  color: var(--ink);
-  padding: 4px 9px;
-  border-radius: 20px;
-}
-
-.detail {
-  margin-top: 18px;
-}
-
-.resources {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.resource {
-  border: 1px solid var(--line);
-  padding: 15px;
-  border-radius: 13px;
-}
-
-.resource a {
-  color: var(--primary);
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.resource a:hover {
-  text-decoration: underline;
-}
-
-.section {
-  margin-top: 25px;
-}
-
-.section-title {
-  margin-bottom: 12px;
-}
-
-.notice {
-  padding: 13px;
-  background: #e9a33b20;
-  border-radius: 12px;
-  font-size: 13px;
-  margin-top: 15px;
-}
-
-.ai-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.ai-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 18px;
-}
-
-.ai-card h3 {
-  margin-top: 0;
-}
-
-.ai-card a {
-  color: var(--primary);
-  font-weight: bold;
-  text-decoration: none;
-}
-
-footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 12px;
-  padding: 25px 10px;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-@media (max-width: 760px) {
-  .container {
-    padding: 10px;
-  }
-
-  .hero {
-    padding: 22px;
-  }
-
-  .toolbar,
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .grid,
-  .resources,
-  .ai-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .years {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4px;
-  }
-}
-</style>
+    @media (max-width: 900px) {
+      .sidebar { width: 70px; padding: 15px 10px; }
+      .sidebar .brand h1, .sidebar .brand small, .sidebar .nav-label, .sidebar .nav-link span { display: none; }
+      .main { margin-right: 70px; padding: 15px; }
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
 
-<header class="hero">
-  <div class="top">
-    <div>
-      <div>MEDICAL STUDY HUB</div>
-      <h1>مساحتك الطبية 🩺</h1>
-      <div>مساحة تعليمية لتنظيم رحلتك في الطب البشري</div>
+  <!-- القائمة الجانبية -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-stethoscope"></i></div>
+      <div>
+        <h1>مساحتك الطبية</h1>
+        <small>Medical Hub</small>
+      </div>
     </div>
-
-    <button class="btn light-btn" id="theme">
-      ☾ الوضع الليلي
-    </button>
-  </div>
-
-  <p>
-    اكتشف المواد الطبية، ونظّم دراستك، واستفد من المصادر العلمية
-    والأدوات الرقمية في مكان واحد.
-  </p>
-</header>
-
-<div class="toolbar">
-  <input
-    class="field"
-    id="search"
-    placeholder="ابحث عن مادة بالعربية أو الإنجليزية..."
-  >
-
-  <select class="field" id="sem">
-    <option value="all">كل الفصول</option>
-    <option value="1">الفصل الأول</option>
-    <option value="2">الفصل الثاني</option>
-    <option value="summer">الفصل الصيفي</option>
-  </select>
-
-  <button class="btn primary-btn" id="clear">
-    مسح البحث
-  </button>
-</div>
-
-<div class="pills">
-  <button class="pill active" data-filter="all">كل المواد</button>
-  <button class="pill" data-filter="basic">علوم أساسية</button>
-  <button class="pill" data-filter="systems">أجهزة الجسم</button>
-  <button class="pill" data-filter="clinical">مواد سريرية</button>
-</div>
-
-<div class="layout">
-
-  <aside class="panel side">
-    <h3>المستويات الدراسية</h3>
-    <div id="years" class="years"></div>
-
-    <div class="notice">
-      اختر المستوى الذي تدرسه، ثم اضغط على المادة لعرض المصادر
-      والروابط المتاحة لها.
-    </div>
+    <div class="nav-label">القائمة الرئيسية</div>
+    <a href="#planner" class="nav-link active"><i class="fa-solid fa-calendar-days"></i><span>تخطيط الوقت</span></a>
+    <a href="#ai" class="nav-link"><i class="fa-solid fa-robot"></i><span>المساعد الذكي</span></a>
   </aside>
 
-  <main class="panel">
-
-    <div class="head">
-      <div>
-        <h2 id="level">المستوى الأول</h2>
-        <div class="muted">
-          اختر مادة لعرض مصادرها التعليمية.
-        </div>
+  <!-- المحتوى الرئيسي -->
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title">
+        <h2>لوحة التحكم الطبية</h2>
+        <p>مرحباً بك مجدداً يا دكتور المستقبل</p>
       </div>
-
-      <span class="badge" id="count"></span>
+      <div class="topbar-actions">
+        <button class="icon-btn" onclick="toggleTheme()" title="تبديل الوضع الليلي"><i class="fa-solid fa-moon" id="themeIcon"></i></button>
+      </div>
     </div>
 
-    <div class="grid" id="courses"></div>
-
-    <section class="detail" id="detail" hidden>
-      <div class="head">
-        <div>
-          <div class="muted" id="meta"></div>
-          <h2 id="title"></h2>
-          <div class="muted" id="eng"></div>
-        </div>
-
-        <button class="btn" id="close">إغلاق ✕</button>
+    <!-- 1. قسم تخطيط الوقت -->
+    <section id="planner" class="card">
+      <h3><i class="fa-solid fa-calendar-days"></i> جدول تنظيم الوقت والمحاضرات</h3>
+      <div class="form-group">
+        <label>اسم المادة الطبية:</label>
+        <input type="text" id="subjectName" placeholder="مثال: علم الأدوية - Pharmacology">
       </div>
-
-      <div class="resources" id="resources"></div>
-
-      <div class="notice">
-        قد تختلف المواد والفصول حسب الجامعة والخطة الدراسية.
-        تأكد من مطابقة المصادر لمقرراتك.
+      <div class="form-group">
+        <label>عدد المحاضرات الكلي:</label>
+        <input type="number" id="totalLecs" value="20" min="1">
       </div>
+      <div class="form-group">
+        <label>متوسط مدة المحاضرة (بالدقائق):</label>
+        <input type="number" id="lecMins" value="45" min="10">
+      </div>
+      <button class="btn" onclick="calculatePlan()">توليد جدول الخطة الدراسية</button>
+      <div class="result-box" id="planResult" style="display: none;"></div>
     </section>
 
-  </main>
-</div>
-
-<!-- مركز الذكاء الاصطناعي الطبي -->
-<section class="section">
-  <h2 class="section-title">🧠 مركز الذكاء الاصطناعي الطبي</h2>
-
-  <p class="muted">
-    أدوات مساعدة لفهم المعلومات الطبية، ومراجعة الأبحاث،
-    والتعلم من الحالات السريرية.
-  </p>
-
-  <div class="ai-grid">
-
-    <article class="ai-card">
-      <h3>🔬 فهم التحاليل الطبية</h3>
-      <p>
-        استعن بالمساعد لفهم دلالات نتائج التحاليل، والمدى المرجعي،
-        والعوامل التي قد تؤثر في النتائج.
-      </p>
-      <a
-        href="https://chatgpt.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        فتح المساعد الذكي ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>🩻 فهم صور الأشعة</h3>
-      <p>
-        يمكنك استخدام أدوات تدعم الصور لمناقشة المظاهر الظاهرة
-        في الصور الطبية لأغراض تعليمية.
-      </p>
-      <a
-        href="https://chatgpt.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        فتح المساعد الذكي ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>📚 البحث عن الدراسات العلمية</h3>
-      <p>
-        استكشف الأبحاث الطبية والمراجعات العلمية لدعم دراستك
-        والوصول إلى الأدلة المنشورة.
-      </p>
-      <a
-        href="https://consensus.app/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        فتح Consensus ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>💊 معلومات الأدوية</h3>
-      <p>
-        ابحث عن معلومات الأدوية واستعمالاتها وتحذيراتها
-        من مصادر دوائية موثوقة.
-      </p>
-      <a
-        href="https://dailymed.nlm.nih.gov/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        فتح DailyMed ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>🩺 المعلومات السريرية</h3>
-      <p>
-        راجع الموضوعات السريرية والإرشادات الطبية المتاحة
-        للمساعدة في التعلم.
-      </p>
-      <a
-        href="https://www.msdmanuals.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        فتح MSD Manuals ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>🧬 الأبحاث الطبية</h3>
-      <p>
-        ابحث في الدراسات الطبية المنشورة عبر قاعدة البيانات
-        العلمية PubMed.
-      </p>
-      <a
-        href="https://pubmed.ncbi.nlm.nih.gov/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        فتح PubMed ↗
-      </a>
-    </article>
-
-  </div>
-
-  <div class="notice">
-    <strong>تنبيه طبي:</strong>
-    هذه الروابط أدوات مساعدة وليست نظامًا تشخيصيًا متكاملًا.
-    لا تعتمد على الذكاء الاصطناعي وحده لتشخيص الأمراض أو تفسير
-    الأشعة أو اتخاذ قرارات العلاج. يجب مراجعة النتائج مع مختص،
-    وعدم رفع بيانات المرضى الشخصية أو صورهم التي تكشف هويتهم.
-  </div>
-</section>
-
-<!-- المكتبة الطبية -->
-<section class="section">
-  <h2 class="section-title">📖 المكتبة الطبية</h2>
-
-  <div class="ai-grid">
-
-    <article class="ai-card">
-      <h3>PubMed</h3>
-      <p>للبحث عن الأبحاث والمقالات الطبية.</p>
-      <a href="https://pubmed.ncbi.nlm.nih.gov/"
-         target="_blank" rel="noopener noreferrer">
-        استكشاف الأبحاث ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>NCBI Bookshelf</h3>
-      <p>كتب ومراجع علمية وطبية متاحة عبر الإنترنت.</p>
-      <a href="https://www.ncbi.nlm.nih.gov/books/"
-         target="_blank" rel="noopener noreferrer">
-        استكشاف الكتب ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>OpenStax Anatomy</h3>
-      <p>مصادر تعليمية في علم التشريح ووظائف الأعضاء.</p>
-      <a href="https://openstax.org/"
-         target="_blank" rel="noopener noreferrer">
-        فتح OpenStax ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>Radiopaedia</h3>
-      <p>حالات تعليمية ومراجع في التصوير الطبي والأشعة.</p>
-      <a href="https://radiopaedia.org/"
-         target="_blank" rel="noopener noreferrer">
-        فتح Radiopaedia ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>Pathology Outlines</h3>
-      <p>معلومات ومراجع تعليمية في علم الأمراض.</p>
-      <a href="https://www.pathologyoutlines.com/"
-         target="_blank" rel="noopener noreferrer">
-        فتح الموقع ↗
-      </a>
-    </article>
-
-    <article class="ai-card">
-      <h3>NCBI Gene</h3>
-      <p>معلومات علمية عن الجينات والخصائص الجزيئية.</p>
-      <a href="https://www.ncbi.nlm.nih.gov/gene/"
-         target="_blank" rel="noopener noreferrer">
-        استكشاف الجينات ↗
-      </a>
-    </article>
-
-  </div>
-</section>
-
-<footer>
-  مساحتك الطبية 🩺
-  <br>
-  منصة تعليمية مساعدة لطلاب الطب البشري
-  <br>
-  راجع دائمًا خطتك الدراسية والمراجع المعتمدة في جامعتك.
-</footer>
-
-</div>
-
-<script>
-"use strict";
-
-/* روابط المصادر الأساسية */
-const home =
-  "https://sites.google.com/view/aug-medicine/medicine";
-
-const library =
-  "https://sites.google.com/view/aug-medicine/library";
-
-const pages = [
-  "https://sites.google.com/view/aug-medicine/1st-year",
-  "https://sites.google.com/view/aug-medicine/2nd-year",
-  "https://sites.google.com/view/aug-medicine/3rd-year",
-  "https://sites.google.com/view/aug-medicine/clinical-medical-years/4th-year",
-  "https://sites.google.com/view/aug-medicine/clinical-medical-years/5th-year",
-  "https://sites.google.com/view/aug-medicine/clinical-medical-years/6th-year"
-];
-
-/*
-كل مادة:
-[الاسم الإنجليزي، الاسم العربي، الفصل، التصنيف]
-*/
-
-const data = [
-
-[
-"المستوى الأول",
-[
-["Communication Skills","مهارات التواصل",1,"basic"],
-["Organic Chemistry","الكيمياء العضوية",1,"basic"],
-["General Chemistry for Health Sciences","الكيمياء العامة للعلوم الصحية",1,"basic"],
-["Medical Physics","الفيزياء الطبية",1,"basic"],
-["First Aid","الإسعافات الأولية",1,"clinical"],
-["General Biology","الأحياء العامة",1,"basic"],
-["General Physiology","علم وظائف الأعضاء العام",2,"basic"],
-["Behavioral Sciences","العلوم السلوكية",2,"basic"],
-["General Anatomy","التشريح العام",2,"basic"],
-["General Histology","علم الأنسجة العام",2,"basic"],
-["General Embryology","علم الأجنة العام",2,"basic"],
-["General Biochemistry","الكيمياء الحيوية العامة",2,"basic"],
-["Public Health","الصحة العامة",2,"clinical"]
-]
-],
-
-[
-"المستوى الثاني",
-[
-["Immunology","علم المناعة",1,"basic"],
-["General Pathology","علم الأمراض العام",1,"basic"],
-["General Pharmacology","علم الأدوية العام",1,"basic"],
-["General Microbiology","الأحياء الدقيقة العام",1,"basic"],
-["Metabolic Biochemistry","الكيمياء الحيوية الأيضية",1,"basic"],
-["Molecular Biology & Genetics","الأحياء الجزيئية والوراثة",1,"basic"],
-["Clinical Nutrition","التغذية السريرية",2,"clinical"],
-["Cardiovascular System","الجهاز القلبي الوعائي",2,"systems"],
-["Respiratory System","الجهاز التنفسي",2,"systems"],
-["Research Methodology & Biostatistics","منهجية البحث والإحصاء الحيوي",2,"clinical"]
-]
-],
-
-[
-"المستوى الثالث",
-[
-["Endocrine System","جهاز الغدد الصماء",1,"systems"],
-["Digestive System","الجهاز الهضمي",1,"systems"],
-["Reproductive System","الجهاز التناسلي",1,"systems"],
-["Renal System","الجهاز الكلوي",1,"systems"],
-["Neuroscience I","علوم الأعصاب 1",2,"systems"],
-["Neuroscience II","علوم الأعصاب 2",2,"systems"],
-["Blood & Lymphoreticular System","الدم والجهاز اللمفاوي",2,"systems"],
-["Skin and Locomotor System","الجلد والجهاز الحركي",2,"systems"]
-]
-],
-
-[
-"المستوى الرابع",
-[
-["Introduction to Clinical Medicine","مقدمة في الطب السريري",1,"clinical"],
-["Internal Medicine I (Junior)","الباطنة 1",1,"clinical"],
-["Cardiology","أمراض القلب",1,"clinical"],
-["Ophthalmology","طب العيون",2,"clinical"],
-["Orthopedics","جراحة العظام",2,"clinical"],
-["Urology","المسالك البولية",2,"clinical"],
-["General Surgery I (Junior)","الجراحة العامة 1",2,"clinical"],
-["Dermatology","الأمراض الجلدية",2,"clinical"],
-["Medical Imaging","التصوير الطبي",2,"clinical"],
-["Community Medicine","طب المجتمع","summer","clinical"],
-["Family Medicine","طب الأسرة","summer","clinical"],
-["Health Economics","اقتصاديات الصحة","summer","clinical"]
-]
-],
-
-[
-"المستوى الخامس",
-[
-["Gynecology and Obstetrics I (Junior)","النسائية والتوليد 1",1,"clinical"],
-["Hematology and Oncology","أمراض الدم والأورام",1,"clinical"],
-["Neurology","طب الأعصاب",1,"clinical"],
-["Vascular and Cardiothoracic Surgery","جراحة الأوعية والقلب والصدر",1,"clinical"],
-["Forensic Medicine","الطب الشرعي",1,"clinical"],
-["Ear, Nose & Throat (ENT)","الأنف والأذن والحنجرة",1,"clinical"],
-["Pediatrics I (Junior)","طب الأطفال 1",2,"clinical"],
-["Neurosurgery","جراحة الأعصاب",2,"clinical"],
-["Pediatric Surgery","جراحة الأطفال",2,"clinical"],
-["Endocrinology and Metabolic Disorders","الغدد الصماء والاستقلاب",2,"clinical"],
-["Psychiatry & Behavioral Disorders","الطب النفسي",2,"clinical"]
-]
-],
-
-[
-"المستوى السادس",
-[
-["Gynecology and Obstetrics II (Senior)","النسائية والتوليد 2",1,"clinical"],
-["Geriatric Medicine","طب المسنين",1,"clinical"],
-["Accident and Emergency Medicine","طب الحوادث والطوارئ",1,"clinical"],
-["Internal Medicine II (Senior)","الباطنة 2",1,"clinical"],
-["Medical Ethics","الأخلاقيات الطبية",1,"clinical"],
-["Research Project (Clinical Audit)","مشروع بحث وتدقيق سريري",2,"clinical"],
-["Pediatrics II (Senior)","طب الأطفال 2",2,"clinical"],
-["General Surgery II (Senior)","الجراحة العامة 2",2,"clinical"],
-["Anesthesia","التخدير",2,"clinical"]
-]
-]
-
-];
-
-/* الحالة الحالية */
-let currentYear = 0;
-let currentFilter = "all";
-
-const $ = id => document.getElementById(id);
-
-/* أسماء الفصول */
-function semesterName(value) {
-  if (value === "summer") return "الفصل الصيفي";
-  if (value === 1) return "الفصل الأول";
-  return "الفصل الثاني";
-}
-
-/* عرض المستويات */
-function renderYears() {
-  $("years").innerHTML = data.map((year, index) => `
-    <button
-      class="year ${index === currentYear ? "active" : ""}"
-      data-year="${index}"
-    >
-      ${year[0]}
-    </button>
-  `).join("");
-
-  document.querySelectorAll("[data-year]").forEach(button => {
-    button.addEventListener("click", () => {
-      currentYear = Number(button.dataset.year);
-      hideDetails();
-      renderYears();
-      renderCourses();
-    });
-  });
-}
-
-/* تصنيف المواد */
-function categoryName(category) {
-  if (category === "basic") return "علوم أساسية";
-  if (category === "systems") return "أجهزة الجسم";
-  return "مواد سريرية";
-}
-
-/* عرض المواد */
-function renderCourses() {
-  const query = $("search").value.toLowerCase().trim();
-  const semester = $("sem").value;
-
-  const courses = data[currentYear][1].filter(course => {
-    const matchesSemester =
-      semester === "all" ||
-      String(course[2]) === semester;
-
-    const matchesCategory =
-      currentFilter === "all" ||
-      course[3] === currentFilter;
-
-    const matchesSearch =
-      !query ||
-      (course[0] + " " + course[1])
-        .toLowerCase()
-        .includes(query);
-
-    return matchesSemester &&
-      matchesCategory &&
-      matchesSearch;
-  });
-
-  $("level").textContent = data[currentYear][0];
-  $("count").textContent = courses.length + " مادة";
-
-  if (courses.length === 0) {
-    $("courses").innerHTML =
-      "<p class='muted'>لا توجد مواد مطابقة للبحث.</p>";
-    return;
-  }
-
-  const accents = [
-    "#6157d9",
-    "#19a995",
-    "#df5c9b",
-    "#ed9b43",
-    "#4285e8",
-    "#4eaa72"
-  ];
-
-  $("courses").innerHTML = courses.map((course, index) => `
-    <article
-      class="course"
-      style="--accent:${accents[index % accents.length]}"
-      tabindex="0"
-      role="button"
-      data-course="${encodeURIComponent(JSON.stringify(course))}"
-    >
-      <div class="muted">
-        ${semesterName(course[2])}
+    <!-- 2. قسم المساعد الذكي -->
+    <section id="ai" class="card">
+      <h3><i class="fa-solid fa-robot"></i> المساعد الطبي الذكي (عربي / English)</h3>
+      <div class="form-group">
+        <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
+        <input type="text" id="aiQuery" placeholder="مثال: Molecular / Insulin">
       </div>
+      <button class="btn" style="background: var(--secondary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
+      <div class="result-box" id="aiBox" style="display: none;"></div>
+    </section>
+  </main>
 
-      <h3>${course[1]}</h3>
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      document.getElementById('themeIcon').className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    }
 
-      <div class="muted">${course[0]}</div>
+    function calculatePlan() {
+      const name = document.getElementById('subjectName').value || 'المادة الطبية';
+      const total = parseInt(document.getElementById('totalLecs').value);
+      const mins = parseInt(document.getElementById('lecMins').value);
+      const totalHours = ((total * mins) / 60).toFixed(1);
+      const perDay = Math.ceil(total / 14);
 
-      <p>
-        <span class="badge">
-          ${categoryName(course[3])}
-        </span>
-      </p>
-    </article>
-  `).join("");
+      const res = document.getElementById('planResult');
+      res.style.display = 'block';
+      res.innerHTML = `<b>📊 خطة مادة: ${name}</b><br>` +
+                      `• إجمالي وقت المحاضرات: ${totalHours} ساعة.<br>` +
+                      `• المقترح لإنجازها بكفاءة: ${perDay} محاضرات يومياً.`;
+    }
 
-  document.querySelectorAll("[data-course]").forEach(card => {
-    const show = () => {
-      const course = JSON.parse(
-        decodeURIComponent(card.dataset.course)
-      );
-      showDetails(course);
-    };
+    function askAI() {
+      const rawQuery = document.getElementById('aiQuery').value.trim();
+      const box = document.getElementById('aiBox');
+      box.style.display = 'block';
 
-    card.addEventListener("click", show);
-
-    card.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        show();
+      if(!rawQuery) {
+        box.innerHTML = "يرجى كتابة المصطلح أو السؤال الطبي أولاً.";
+        return;
       }
-    });
-  });
-}
 
-/* عرض تفاصيل المادة وروابطها */
-function showDetails(course) {
-  $("detail").hidden = false;
+      let arDef = `المفهوم السريري والتعريف لـ (${rawQuery}): دراسة الخصائص والهدف الوظيفي بدقة عالية.`;
+      let arMech = `الآلية والمسار الحيوي: تفاعل الخلايا والأعضاء لإنتاج الاستجابة العضوية المرتبطة بـ (${rawQuery}).`;
+      let enDef = `Clinical definition of (${rawQuery}): Comprehensive analysis of functional properties.`;
+      let enMech = `Pathophysiological mechanism: Step-by-step biological response associated with (${rawQuery}).`;
 
-  $("title").textContent = course[1];
-  $("eng").textContent = course[0];
+      const q = rawQuery.toLowerCase();
+      if(q.includes('molecular') || q.includes('moleculer') || q.includes('جزيئي')) {
+        arDef = "المستوى الجزيئي (Molecular Level): يدرس العمليات الحيوية والتشكيل البنيوي للجزيئات كـ DNA والبروتينات داخل الخلية.";
+        arMech = "الآلية: تفاعل جزيئي دقيق يتم عبر نسخ الترجمة وبناء السلسلة البروتينية لتحديد وظيفة الخلية.";
+        enDef = "Molecular Level: Studies biological processes and structures of biomolecules like DNA and proteins within cells.";
+        enMech = "Mechanism: Precise molecular interactions via gene transcription and protein synthesis.";
+      }
 
-  $("meta").textContent =
-    data[currentYear][0] +
-    " · " +
-    semesterName(course[2]);
-
-  const searchQuery = encodeURIComponent(
-    course[0] + " medical lecture notes"
-  );
-
-  const resources = [
-    {
-      title: "صفحة المستوى",
-      url: pages[currentYear]
-    },
-    {
-      title: "الموقع الرئيسي",
-      url: home
-    },
-    {
-      title: "المكتبة الطبية",
-      url: library
-    },
-    {
-      title: "بحث عن محاضرات المادة",
-      url: "https://www.google.com/search?q=" + searchQuery
-    },
-    {
-      title: "أبحاث علمية",
-      url: "https://pubmed.ncbi.nlm.nih.gov/?term
+      box.innerHTML = `<b>🤖 إجابة المساعد الذكي حول (${rawQuery}):</b><br><br>` +
+                      `🔹 <b>الشرح والتعريف بالعربية:</b><br>` +
+                      `1. <u>التعريف والصفات:</u> ${arDef}<br>` +
+                      `2. <u>الآلية والمسار:</u> ${arMech}<br><br>` +
+                      `🔹 <b>English Retention Notes:</b><br>` +
+                      `1. <u>Definition & Properties:</u> ${enDef}<br>` +
+                      `2. <u>Mechanism:</u> ${enMech}`;
+    }
+  </script>
+</body>
+</html>
