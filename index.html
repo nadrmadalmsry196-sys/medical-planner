@@ -3,238 +3,251 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071426">
-  <title>مساحتك الطبية | Medical Study Hub</title>
+  <meta name="theme-color" content="#0d1b2a">
+  <title>مساحتك الطبية السحابية | Medical Study Hub</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- مكتبة Supabase السحابية -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
-      --bg: #f4f7fb;
-      --surface: #ffffff;
-      --surface-2: #edf3f9;
-      --text: #15243b;
-      --muted: #718096;
-      --primary: #087f8c;
-      --primary-dark: #056570;
-      --secondary: #4263eb;
-      --accent: #11b8a6;
-      --border: #e3eaf2;
-      --shadow: 0 12px 35px rgba(24, 50, 84, .07);
-      --radius: 20px;
+      --bg: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+      --surface: rgba(255, 255, 255, 0.95);
+      --surface-2: #f8fafc;
+      --text: #1e293b;
+      --muted: #64748b;
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --secondary: #0d9488;
+      --accent: #f59e0b;
+      --border: #cbd5e1;
+      --shadow: 0 20px 40px -15px rgba(2, 132, 199, 0.15);
+      --radius: 24px;
     }
 
     body.dark {
-      --bg: #08111f;
-      --surface: #101d2e;
-      --surface-2: #17263a;
-      --text: #e9f0fb;
-      --muted: #a0b0c6;
-      --primary: #32c7c7;
-      --primary-dark: #1ba5ac;
-      --secondary: #8ca6ff;
-      --accent: #39d6b2;
-      --border: #26364b;
-      --shadow: 0 12px 35px rgba(0, 0, 0, .16);
+      --bg: linear-gradient(135deg, #0f172a 0%, #090d16 100%);
+      --surface: rgba(30, 41, 59, 0.95);
+      --surface-2: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-dark: #0ea5e9;
+      --secondary: #2dd4bf;
+      --accent: #fbbf24;
+      --border: #334155;
+      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; transition: background .25s, color .25s; padding: 20px; }
+    body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.8; transition: all 0.3s ease; padding: 20px; }
 
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; border: none; background: none; }
 
-    .container { max-width: 900px; margin: auto; }
+    .container { max-width: 950px; margin: auto; }
 
-    /* شاشة تسجيل الدخول المباشرة والمضمونة */
-    #loginScreen {
+    /* شاشة تسجيل الدخول السحابية */
+    #authScreen {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 80vh; text-align: center;
+      min-height: 85vh; text-align: center;
     }
-    .login-card {
-      background: var(--surface); border: 1px solid var(--border); padding: 35px;
-      border-radius: var(--radius); box-shadow: var(--shadow); max-width: 450px; width: 100%;
+    .auth-card {
+      background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); padding: 45px 30px;
+      border-radius: var(--radius); box-shadow: var(--shadow); max-width: 480px; width: 100%;
+      animation: fadeIn 0.6s ease-in-out;
     }
-    .login-card h2 { color: var(--primary); font-weight: 900; margin-bottom: 8px; font-size: 22px; }
-    .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-    .login-input {
-      width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 12px;
-      background: var(--surface-2); color: var(--text); margin-bottom: 15px; outline: none; font-size: 14px; text-align: center;
+    .auth-card h2 { color: var(--primary); font-weight: 900; margin-bottom: 10px; font-size: 26px; }
+    .auth-card p { color: var(--muted); font-size: 14px; margin-bottom: 25px; }
+    .auth-input {
+      width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 14px;
+      background: var(--surface-2); color: var(--text); margin-bottom: 15px; outline: none; font-size: 15px; text-align: center; transition: 0.3s;
     }
+    .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
 
+    /* الهيدر البهي والبهيج */
     header {
-      background: linear-gradient(135deg, #071426, #087f8c);
-      color: white; padding: 25px; border-radius: var(--radius);
-      text-align: center; margin-bottom: 20px; box-shadow: var(--shadow);
-      position: relative;
+      background: linear-gradient(135deg, #0284c7, #0d9488);
+      color: white; padding: 30px; border-radius: var(--radius);
+      text-align: center; margin-bottom: 25px; box-shadow: var(--shadow);
+      position: relative; overflow: hidden;
     }
-    header h1 { font-size: 22px; font-weight: 900; margin-bottom: 5px; }
-    header p { font-size: 12px; opacity: 0.9; }
+    header h1 { font-size: 26px; font-weight: 900; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    header p { font-size: 13px; opacity: 0.95; }
 
     .theme-toggle {
       position: absolute; left: 20px; top: 25px;
-      background: rgba(255,255,255,0.2); border: none; color: white;
-      padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer;
+      background: rgba(255, 255, 255, 0.25); border: none; color: white;
+      padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s;
+      backdrop-filter: blur(5px);
     }
-    .theme-toggle:hover { background: rgba(255,255,255,0.3); }
+    .theme-toggle:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
 
     .user-info-badge {
       display: flex; justify-content: space-between; align-items: center;
-      background: rgba(255,255,255,0.15); padding: 8px 15px; border-radius: 12px;
-      margin-top: 12px; font-size: 12px; backdrop-filter: blur(5px); flex-wrap: wrap; gap: 8px;
+      background: rgba(0, 0, 0, 0.15); padding: 10px 18px; border-radius: 14px;
+      margin-top: 15px; font-size: 13px; backdrop-filter: blur(5px); flex-wrap: wrap; gap: 10px;
     }
-    .logout-btn { background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .logout-btn { background: #ef4444; color: white; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .logout-btn:hover { background: #dc2626; }
 
+    /* البطاقة الكبرى والتبويبات */
     .master-card {
-      background: var(--surface);
+      background: var(--surface); backdrop-filter: blur(10px);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
+      animation: fadeIn 0.4s ease-in-out;
     }
 
     .tabs-header {
       display: flex; background: var(--surface-2);
-      padding: 10px 10px 0 10px; gap: 5px; border-bottom: 1px solid var(--border);
+      padding: 12px 12px 0 12px; gap: 8px; border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
     }
     .tab-btn {
-      background: transparent; border: none; padding: 12px 16px;
-      border-radius: 10px 10px 0 0; cursor: pointer; font-weight: 700;
-      font-size: 12px; color: var(--muted); transition: all 0.3s;
-      display: flex; align-items: center; gap: 6px;
+      background: transparent; border: none; padding: 14px 20px;
+      border-radius: 12px 12px 0 0; cursor: pointer; font-weight: 700;
+      font-size: 13px; color: var(--muted); transition: all 0.3s;
+      display: flex; align-items: center; gap: 8px;
     }
+    .tab-btn:hover { color: var(--primary); background: rgba(2, 132, 199, 0.05); }
     .tab-btn.active {
       background: var(--surface); color: var(--primary);
-      border-top: 3px solid var(--primary); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+      border-top: 4px solid var(--primary); box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
     }
 
-    .section-content { padding: 25px; display: none; }
-    .section-content.active { display: block; }
-    .section-content h3 { color: var(--primary); margin-top: 0; font-size: 17px; font-weight: 900; margin-bottom: 18px; border-bottom: 2px solid var(--surface-2); padding-bottom: 10px; }
+    .section-content { padding: 30px; display: none; }
+    .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+    .section-content h3 { color: var(--primary); margin-top: 0; font-size: 19px; font-weight: 900; margin-bottom: 20px; border-bottom: 2px solid var(--surface-2); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
 
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--text); }
     input, select, textarea {
-      width: 100%; padding: 12px; border: 1px solid var(--border);
-      border-radius: 12px; background: var(--surface-2); color: var(--text);
-      outline: none; font-family: "Cairo", sans-serif;
+      width: 100%; padding: 14px; border: 2px solid var(--border);
+      border-radius: 14px; background: var(--surface-2); color: var(--text);
+      outline: none; font-family: "Cairo", sans-serif; transition: 0.3s;
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(8,127,140,.08); }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
 
     .btn {
-      background: var(--primary); color: white; border: none;
-      padding: 12px 20px; border-radius: 12px; font-family: "Cairo", sans-serif;
-      font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; transition: opacity 0.2s;
+      background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none;
+      padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif;
+      font-weight: 800; font-size: 14px; cursor: pointer; width: 100%; transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
     }
-    .btn:hover { opacity: 0.9; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(2, 132, 199, 0.3); }
 
     .result-box {
-      margin-top: 15px; padding: 16px; background: var(--surface-2);
-      border-radius: 12px; border-right: 4px solid var(--primary); font-size: 13px; line-height: 1.7;
+      margin-top: 18px; padding: 18px; background: var(--surface-2);
+      border-radius: 14px; border-right: 5px solid var(--primary); font-size: 14px; line-height: 1.8;
+      border: 1px solid var(--border);
     }
 
-    .progress-container { margin-top: 15px; background: var(--surface-2); border-radius: 10px; height: 16px; overflow: hidden; border: 1px solid var(--border); }
-    .progress-bar { background: var(--accent); height: 100%; width: 0%; transition: width 0.4s; text-align: center; color: white; font-size: 10px; font-weight: bold; line-height: 16px; }
+    .progress-container { margin-top: 18px; background: var(--surface-2); border-radius: 12px; height: 20px; overflow: hidden; border: 2px solid var(--border); }
+    .progress-bar { background: linear-gradient(135deg, var(--secondary), var(--primary)); height: 100%; width: 0%; transition: width 0.5s ease; text-align: center; color: white; font-size: 11px; font-weight: bold; line-height: 18px; }
 
-    .quiz-card { background: var(--surface-2); padding: 20px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border); }
-    .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 1px solid var(--border); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; font-weight: 700; color: var(--text); transition: 0.2s; cursor: pointer; }
-    .option-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+    .quiz-card { background: var(--surface-2); padding: 22px; border-radius: 16px; margin-top: 18px; border: 2px solid var(--border); }
+    .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 2px solid var(--border); padding: 14px 18px; border-radius: 12px; margin-bottom: 12px; font-weight: 700; color: var(--text); transition: 0.2s; cursor: pointer; }
+    .option-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(-5px); }
 
-    .proctor-modal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-      z-index: 9999; justify-content: center; align-items: center; padding: 20px;
-    }
-    .proctor-content {
-      background: var(--surface); padding: 25px; border-radius: 16px;
-      max-width: 450px; width: 100%; text-align: center; border: 2px solid var(--accent);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    /* جدول لوحة تحكم الأدمن */
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+    .admin-table th, .admin-table td { border: 1px solid var(--border); padding: 10px; text-align: center; }
+    .admin-table th { background: var(--primary); color: white; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <!-- شاشة تسجيل الدخول المباشرة -->
-  <div id="loginScreen" class="container">
-    <div class="login-card">
-      <div style="font-size: 45px; color: var(--primary); margin-bottom: 15px;"><i class="fa-solid fa-stethoscope"></i></div>
-      <h2>مساحتك الطبية الذكية</h2>
-      <p>أدخل بريدك الإلكتروني (Gmail) واسمك للوصول إلى المنصة وحفظ سجلك الأكاديمي.</p>
+  <!-- شاشة الدخول السحابية -->
+  <div id="authScreen" class="container">
+    <div class="auth-card">
+      <div style="font-size: 55px; color: var(--primary); margin-bottom: 15px;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <h2>منصتك الطبية السحابية</h2>
+      <p>سجل اسمك وإيميلك لتبدأ المزامنة الفورية مع قاعدة البيانات السحابية.</p>
       
-      <input type="text" id="inputName" class="login-input" placeholder="اسمك الكريم (مثال: د. نادر)">
-      <input type="email" id="inputEmail" class="login-input" placeholder="البريد الإلكتروني (student@gmail.com)">
+      <input type="text" id="inputName" class="auth-input" placeholder="اسمك الكريم (مثال: د. نادر)">
+      <input type="email" id="inputEmail" class="auth-input" placeholder="البريد الإلكتروني (student@gmail.com)">
       
-      <button type="button" class="btn" style="background: #db4437; display: flex; align-items: center; justify-content: center; gap: 10px;" id="loginBtn">
-        <i class="fa-brands fa-google"></i> تسجيل الدخول بحساب Google
-      </button>
+      <button type="button" class="btn" id="authBtn">الدخول السحابي الموثق ✨</button>
     </div>
   </div>
 
-  <!-- محتوى المنصة -->
+  <!-- لوحة التحكم السحابية والبهيجة -->
   <div id="appContent" class="container" style="display: none;">
     <header>
       <button type="button" class="theme-toggle" id="themeBtn">🌙 الوضع الليلي</button>
-      <h1>🥼 مساحتك الطبية الذكية</h1>
-      <p>منصتك المتكاملة لتنظيم رحلتك في الطب البشري يا دكتور المستقبل</p>
+      <h1>🩺 مساحتك الطبية السحابية</h1>
+      <p>مرتبطة مباشرة بقاعدة بيانات Supabase السحابية يا دكتور المستقبل</p>
       
       <div class="user-info-badge">
-        <span>👤 الطالب: <b id="studentName">طالب طب</b> (<span id="studentEmail">student@gmail.com</span>) | 🏆 النقاط: <b id="userPoints">0</b></span>
+        <span>👤 د. <b id="studentName">طالب طب</b> (<span id="studentEmail">...</span>) | 🏆 نقاطك السحابية: <b id="userPoints" style="color: var(--accent);">0</b> نقطة</span>
         <button type="button" class="logout-btn" id="logoutBtn">تسجيل الخروج</button>
       </div>
     </header>
 
     <div class="master-card">
-      <div class="tabs-header">
+      <div class="tabs-header" id="tabsHeader">
         <button type="button" class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
         <button type="button" class="tab-btn" onclick="switchTab(event, 'progress')"><i class="fa-solid fa-chart-line"></i> تتبع التقدم</button>
         <button type="button" class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات ونقاط</button>
         <button type="button" class="tab-btn" onclick="switchTab(event, 'ai')"><i class="fa-solid fa-robot"></i> المساعد الذكي</button>
+        <!-- تبويب الأدمن يظهر فقط للأدمن تلقائياً -->
+        <button type="button" id="adminTabBtn" class="tab-btn" style="display:none; color: #ef4444;" onclick="switchTab(event, 'adminPanel')"><i class="fa-solid fa-user-shield"></i> لوحة تحكم الأدمن 🛡️</button>
       </div>
 
       <!-- 1. تخطيط الوقت -->
       <div id="planner" class="section-content active">
-        <h3>📅 جدول تنظيم الوقت والمحاضرات</h3>
+        <h3><i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i> جدول تنظيم الوقت والمحاضرات</h3>
         <div class="form-group">
           <label>اسم المادة الطبية:</label>
-          <input type="text" id="subjectName" placeholder="مثال: علم الأدوية - Pharmacology">
+          <input type="text" id="subjectName" placeholder="مثال: علم الأدوية السريري - Pharmacology">
         </div>
         <div class="form-group">
           <label>عدد المحاضرات الكلي:</label>
-          <input type="number" id="totalLecs" value="20" min="1">
+          <input type="number" id="totalLecs" value="24" min="1">
         </div>
         <div class="form-group">
           <label>متوسط مدة المحاضرة (بالدقائق):</label>
-          <input type="number" id="lecMins" value="45" min="10">
+          <input type="number" id="lecMins" value="50" min="10">
         </div>
-        <button type="button" class="btn" onclick="calculatePlan()">توليد جدول الخطة الدراسية</button>
+        <button type="button" class="btn" onclick="calculatePlan()">توليد الخطة الدراسية الذكية 📊</button>
         <div class="result-box" id="planResult" style="display: none;"></div>
       </div>
 
       <!-- 2. تتبع التقدم -->
       <div id="progress" class="section-content">
-        <h3>📈 شريط تتبع إنجاز المادة والـ Streak</h3>
+        <h3><i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i> شريط تتبع إنجاز المادة والـ Streak اليومي</h3>
         <div class="form-group">
-          <label>كم محاضرة أنجزت حتى الآن؟</label>
-          <input type="number" id="completedLecs" value="5" min="0" oninput="updateProgress()">
+          <label>كم محاضرة أنجزت حتى الآن بحمد الله؟</label>
+          <input type="number" id="completedLecs" value="6" min="0" oninput="updateProgress()">
         </div>
-        <p style="font-size: 13px; font-weight: 700;">نسبة الإنجاز الكلية للمادة:</p>
+        <label>نسبة الإنجاز الكلية للمادة:</label>
         <div class="progress-container">
           <div id="progressBar" class="progress-bar">0%</div>
         </div>
-        <div class="result-box" id="streakMsg" style="margin-top: 15px;">🔥 استمر يا دكتور المستقبل! الانتظام اليومي هو سر التفوق الطبي.</div>
+        <div class="result-box" id="streakMsg" style="margin-top: 18px;">🔥 عظمة على عظمة يا دكتور المستقبل! الانتظام اليومي يمهد لك طريق التميز والأول على الدفعة.</div>
       </div>
 
       <!-- 3. اختبارات ونقاط -->
       <div id="quiz" class="section-content">
-        <h3>📝 اختبار قياس الفهم (مع نظام النقاط والمراقبة)</h3>
+        <h3><i class="fa-solid fa-award" style="color: var(--primary);"></i> اختبار قياس الفهم (تحديث النقاط سحابياً)</h3>
         <div class="form-group">
           <label>الصق نص أو ملخص المحاضرة الطبية هنا:</label>
-          <textarea id="lectureText" rows="5" placeholder="الصق النص هنا ليتم تحليل وتوليد الأسئلة منه تلقائياً..."></textarea>
+          <textarea id="lectureText" rows="5" placeholder="الصق النص here ليقوم محرك التقييم بتحليله وتوليد الأسئلة..."></textarea>
         </div>
-        <button type="button" class="btn" style="background: var(--accent);" onclick="triggerProctorModal()">بدء الاختبار (تفعيل نظام المراقبة والنقاط)</button>
+        <button type="button" class="btn" style="background: linear-gradient(135deg, var(--secondary), var(--accent));" onclick="generateInteractiveQuiz()">بدء الاختبار وكسب النقاط السحابية 🚀</button>
         
         <div id="quizContainer" style="display: none;"></div>
         <div class="result-box" id="finalQuizRes" style="display: none;"></div>
@@ -242,56 +255,77 @@
 
       <!-- 4. المساعد الذكي -->
       <div id="ai" class="section-content">
-        <h3>🤖 المساعد الطبي الذكي (عربي / English للحفظ السريع)</h3>
+        <h3><i class="fa-solid fa-brain" style="color: var(--primary);"></i> المساعد الطبي الذكي (عربي / English)</h3>
         <div class="form-group">
           <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
-          <input type="text" id="aiQuery" placeholder="مثال: Molecular / Insulin / الهرمونات">
+          <input type="text" id="aiQuery" placeholder="مثال: Insulin / Molecular / Pathophysiology">
         </div>
-        <button type="button" class="btn" style="background: var(--secondary);" onclick="askAI()">طلب تبسيط وشرح منظم (AI)</button>
+        <button type="button" class="btn" style="background: linear-gradient(135deg, #4f46e5, var(--primary));" onclick="askAI()">طلب تبسيط وشرح سريري 💡</button>
         <div class="result-box" id="aiBox" style="display: none;"></div>
+      </div>
+
+      <!-- 5. لوحة تحكم الأدمن السحابية -->
+      <div id="adminPanel" class="section-content">
+        <h3><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> لوحة تحكم الأدمن (إدارة جميع الطلاب سحابياً)</h3>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 15px;">هنا يمكنك الاطلاع على جميع الطلاب المسجلين في المنصة ونقاطهم الحية:</p>
+        <button type="button" class="btn" style="background: #0284c7; margin-bottom: 15px;" onclick="loadAllStudents()">تحديث وتنزيل بيانات الطلاب 🔄</button>
+        <div id="adminTableContainer" style="overflow-x: auto;"></div>
       </div>
     </div>
   </div>
 
-  <!-- نافذة تنبيه المراقبة الوهمية -->
-  <div class="proctor-modal" id="proctorModal">
-    <div class="proctor-content">
-      <i class="fa-solid fa-video" style="font-size: 40px; color: var(--accent); margin-bottom: 15px;"></i>
-      <h3 style="color: var(--primary); margin-bottom: 10px; font-weight: 900;">⚠️ نظام المراقبة الأكاديمية النشط</h3>
-      <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6;">
-        تنبيه يا دكتور المستقبل: يتم الآن مراقبة جلسة الامتحان عبر الذكاء الاصطناعي (AI Proctoring) لضمان النزاهة وسجل الأداء. يرجى التركيز وعدم مغادرة الصفحة.
-      </p>
-      <button type="button" class="btn" onclick="startActualQuiz()">مفهوم، ابدأ الاختبار الآن 🚀</button>
-    </div>
-  </div>
-
   <script>
+    // 🔗 ربط Supabase بالمفاتيح الخاصة بمشروعك السحابي
+    const SUPABASE_URL = 'https://klyklffwqfltpdeztqev.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtseWtsZmZ3cWZsdHBkZXp0cWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTc1NjYsImV4cCI6MjEwNzg3MzU2Nn0.ovY6K7vMic_0CGahIvCZHvJilLQFso41dubo4SswsEA'; 
+    
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // إيميلك الشخصي كأدمن
+    const ADMIN_EMAIL = 'nadrmadalmsry196@gmail.com';
+
     document.addEventListener("DOMContentLoaded", function() {
-      const savedEmail = localStorage.getItem('medical_hub_email');
-      const savedName = localStorage.getItem('medical_hub_name');
+      const savedEmail = localStorage.getItem('bhia_medical_email');
+      const savedName = localStorage.getItem('bhia_medical_name');
       if (savedEmail) {
         showApp(savedName, savedEmail);
       }
 
-      document.getElementById('loginBtn').addEventListener('click', function() {
+      document.getElementById('authBtn').addEventListener('click', async function() {
         const nameVal = document.getElementById('inputName').value.trim();
-        const emailVal = document.getElementById('inputEmail').value.trim();
+        const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
 
         if (!nameVal || !emailVal || !emailVal.includes('@')) {
-          alert("الرجاء إدخال الاسم وبريد Gmail صحيح!");
+          alert("الرجاء إدخال الاسم وبريد إلكتروني صحيح لتبدأ رحلتك!");
           return;
         }
 
-        localStorage.setItem('medical_hub_email', emailVal);
-        localStorage.setItem('medical_hub_name', nameVal);
+        // فحص وإنشاء الطالب في جدول Supabase سحابياً
+        const { data, error } = await supabaseClient
+          .from('students')
+          .select('*')
+          .eq('email', emailVal)
+          .single();
+
+        let isAdmin = (emailVal === ADMIN_EMAIL);
+
+        if (!data) {
+          // تسجيل طالب جديد في قاعدة البيانات
+          await supabaseClient.from('students').insert([
+            { email: emailVal, full_name: nameVal, points: 0, is_admin: isAdmin }
+          ]);
+        }
+
+        localStorage.setItem('bhia_medical_email', emailVal);
+        localStorage.setItem('bhia_medical_name', nameVal);
         showApp(nameVal, emailVal);
       });
 
       document.getElementById('logoutBtn').addEventListener('click', function() {
-        localStorage.removeItem('medical_hub_email');
-        localStorage.removeItem('medical_hub_name');
+        localStorage.removeItem('bhia_medical_email');
+        localStorage.removeItem('bhia_medical_name');
         document.getElementById('appContent').style.display = 'none';
-        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('authScreen').style.display = 'flex';
       });
 
       document.getElementById('themeBtn').addEventListener('click', function() {
@@ -299,24 +333,50 @@
         const isDark = document.body.classList.contains('dark');
         this.innerHTML = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
       });
+      
+      updateProgress();
     });
 
-    function showApp(name, email) {
-      document.getElementById('loginScreen').style.display = 'none';
+    async function showApp(name, email) {
+      document.getElementById('authScreen').style.display = 'none';
       document.getElementById('appContent').style.display = 'block';
       document.getElementById('studentName').innerText = name;
       document.getElementById('studentEmail').innerText = email;
-      
-      let userPoints = parseInt(localStorage.getItem('points_' + email)) || 0;
-      document.getElementById('userPoints').innerText = userPoints;
+
+      // جلب النقاط الحية من Supabase
+      const { data } = await supabaseClient
+        .from('students')
+        .select('points, is_admin')
+        .eq('email', email)
+        .single();
+
+      let currentPoints = data ? data.points : 0;
+      document.getElementById('userPoints').innerText = currentPoints;
+
+      // إظهار زر لوحة تحكم الأدمن إذا كان هو الأدمن
+      if (email === ADMIN_EMAIL || (data && data.is_admin)) {
+        document.getElementById('adminTabBtn').style.display = 'inline-flex';
+      }
     }
 
-    function addPointsForUser(pts) {
-      const email = localStorage.getItem('medical_hub_email');
-      let userPoints = parseInt(localStorage.getItem('points_' + email)) || 0;
-      userPoints += pts;
-      localStorage.setItem('points_' + email, userPoints);
-      document.getElementById('userPoints').innerText = userPoints;
+    async function addPointsToCloud(pts) {
+      const email = localStorage.getItem('bhia_medical_email');
+      if (!email) return;
+
+      const { data } = await supabaseClient
+        .from('students')
+        .select('points')
+        .eq('email', email)
+        .single();
+
+      let newPoints = (data ? data.points : 0) + pts;
+
+      await supabaseClient
+        .from('students')
+        .update({ points: newPoints })
+        .eq('email', email);
+
+      document.getElementById('userPoints').innerText = newPoints;
     }
 
     function switchTab(evt, sectionId) {
@@ -324,98 +384,46 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(sectionId).classList.add('active');
       evt.currentTarget.classList.add('active');
+      if(sectionId === 'adminPanel') {
+        loadAllStudents();
+      }
+    }
+
+    async function loadAllStudents() {
+      const container = document.getElementById('adminTableContainer');
+      container.innerHTML = "جاري تحميل بيانات جميع الطلاب من السحابة... ⏳";
+
+      const { data, error } = await supabaseClient
+        .from('students')
+        .select('*')
+        .order('points', { ascending: false });
+
+      if (error || !data) {
+        container.innerHTML = "حدث خطأ أثناء جلب البيانات.";
+        return;
+      }
+
+      let html = `<table class="admin-table">
+        <tr>
+          <th>اسم الطالب</th>
+          <th>البريد الإلكتروني</th>
+          <th>النقاط السحابية</th>
+          <th>صلاحية الأدمن</th>
+        </tr>`;
+
+      data.forEach(st => {
+        html += `<tr>
+          <td><b>${st.full_name}</b></td>
+          <td>${st.email}</td>
+          <td><span style="color:var(--accent); font-weight:bold;">${st.points}</span></td>
+          <td>${st.is_admin ? '🛡️ أدمن' : 'طالب'}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+      container.innerHTML = html;
     }
 
     function calculatePlan() {
       const name = document.getElementById('subjectName').value || 'المادة الطبية';
-      const total = parseInt(document.getElementById('totalLecs').value);
-      const mins = parseInt(document.getElementById('lecMins').value);
-      const totalHours = ((total * mins) / 60).toFixed(1);
-      const perDay = Math.ceil(total / 14);
-
-      const res = document.getElementById('planResult');
-      res.style.display = 'block';
-      res.innerHTML = `<b>📊 خطة مادة: ${name}</b><br>` +
-                      `• إجمالي وقت المحاضرات: ${totalHours} ساعة.<br>` +
-                      `• المقترح لإنجازها بكفاءة: ${perDay} محاضرات يومياً.`;
-    }
-
-    function updateProgress() {
-      const total = parseInt(document.getElementById('totalLecs').value) || 20;
-      const completed = parseInt(document.getElementById('completedLecs').value) || 0;
-      let percent = Math.round((completed / total) * 100);
-      if(percent > 100) percent = 100;
-      
-      const bar = document.getElementById('progressBar');
-      bar.style.width = percent + '%';
-      bar.innerText = percent + '%';
-    }
-
-    function triggerProctorModal() {
-      const text = document.getElementById('lectureText').value.trim();
-      if(!text) {
-        alert("الرجاء لصق نص المحاضرة أولاً لبدء الاختبار والمراقبة!");
-        return;
-      }
-      document.getElementById('proctorModal').style.display = 'flex';
-    }
-
-    function startActualQuiz() {
-      document.getElementById('proctorModal').style.display = 'none';
-      generateInteractiveQuiz();
-    }
-
-    let currentQuizData = [];
-    let currentQuestionIdx = 0;
-    let score = 0;
-
-    function generateInteractiveQuiz() {
-      currentQuizData = [
-        { q: "ما هو المحور الأساسي الذي يركز عليه هذا النص الطبي؟", options: ["فهم الآليات والمسارات الحيوية المرضية", "الحفظ السطحي للأعراض فقط", "تجاهل العمليات الجزيئية"], correct: 0 },
-        { q: "ما هي الأهمية السريرية لدراسة هذه الآلية بعمق؟", options: ["تشخيص وعلاج الخلل الوظيفي بدقة", "زيادة عدد ساعات النوم", "ليس لها فائدة سريرية"], correct: 0 },
-        { q: "كيف يتم استرجاع هذه المعلومات بكفاءة عالية أثناء الامتحان؟", options: ["عبر الفهم المتسلسل والخرائط الذهنية", "بالعشوائية", "التخمين المطلق"], correct: 0 },
-        { q: "أي من التالي يمثل خطوة أساسية في الفسيولوجيا المرضية (Pathophysiology)؟", options: ["تتبع الخلل الخلوي والجزيئي", "تأثير الطقس الخارجي", "تغير لون الغرفة"], correct: 0 },
-        { q: "ما هو الهدف من تحليل النصوص الطبية البحتة؟", options: ["بناء قاعدة معلومات سريرية صلبة", "إهدار الوقت", "زيادة التعقيد"], correct: 0 },
-        { q: "عند دراسة التفاعلات الحيوية، ما هو العنصر الأهم؟", options: ["فهم الإنزيمات والمسارات الناظمة", "حفظ أرقام الصفحات", "تجاهل المصطلحات الإنجليزية"], correct: 0 },
-        { q: "ما هو المعيار الحقيقي لتقييم فهمك للمادة؟", options: ["قدرتك على شرح الآلية بأسلوبك", "إغلاق الكتاب بسرعة", "نسيان التفاصيل بعد ساعة"], correct: 0 },
-        { q: "ما هي الطريقة المثلى للتعامل مع المصطلحات الصعبة؟", options: ["تقسيمها لجذور وربطها بالوظيفة", "تخطيها تماماً", "حفظ حروفها بدون فهم"], correct: 0 },
-        { q: "لماذا يُعد الانتظام اليومي سر التفوق الطبي؟", options: ["لأن الكميات الكبيرة تحتاج تراكم هادئ", "لأن الكسل مفيد", "لا توجد فائدة"], correct: 0 },
-        { q: "ما هو اللقب المستحق لمن يتقن هذه المهارات بامتياز؟", options: ["دكتور المستقبل المتميز", "طالب مبتدئ", "متابع عابر"], correct: 0 }
-      ];
-
-      currentQuestionIdx = 0;
-      score = 0;
-      document.getElementById('finalQuizRes').style.display = 'none';
-      document.getElementById('quizContainer').style.display = 'block';
-      renderQuestion();
-    }
-
-    function renderQuestion() {
-      const container = document.getElementById('quizContainer');
-      if (currentQuestionIdx < currentQuizData.length) {
-        const qObj = currentQuizData[currentQuestionIdx];
-        let html = `<div class="quiz-card">
-          <p style="font-weight:900; margin-bottom:12px; color:var(--primary);">السؤال (${currentQuestionIdx + 1} من ${currentQuizData.length}) [مراقب 👁️‍🗨️]:</p>
-          <p style="font-weight:700; margin-bottom:15px;">${qObj.q}</p>`.trim();
-        
-        qObj.options.forEach((opt, idx) => {
-          html += `<button type="button" class="option-btn" onclick="checkAnswer(${idx})">${opt}</button>`;
-        });
-        html += `</div>`;
-        container.innerHTML = html;
-      } else {
-        showFinalResult();
-      }
-    }
-
-    function checkAnswer(selectedIdx) {
-      const qObj = currentQuizData[currentQuestionIdx];
-      if (selectedIdx === qObj.correct) {
-        score++;
-      }
-      currentQuestionIdx++;
-      renderQuestion();
-    }
-
-    function showFinalResult() {
-      const container
+      const total = parseInt(document.getElementById('totalLecs').value) || 24;
+      const mins = parseInt(document.getElementById('lecMins').
