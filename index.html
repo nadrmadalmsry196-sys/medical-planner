@@ -3,427 +3,629 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0d1b2a">
-  <title>مساحتك الطبية السحابية | Medical Study Hub</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  
-  <!-- مكتبة Supabase السحابية -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  <title>مساحتك الطبية | Medical Study Hub</title>
+  <meta name="description" content="منصة تعليمية لتنظيم دراسة الطب ومراجعة المصطلحات الطبية والاختبارات القصيرة.">
   <style>
     :root {
-      --bg: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
-      --surface: rgba(255, 255, 255, 0.95);
-      --surface-2: #f8fafc;
-      --text: #1e293b;
+      --bg: #f3f7fc;
+      --card: #ffffff;
+      --text: #17243a;
       --muted: #64748b;
-      --primary: #0284c7;
-      --primary-dark: #0369a1;
-      --secondary: #0d9488;
-      --accent: #f59e0b;
-      --border: #cbd5e1;
-      --shadow: 0 20px 40px -15px rgba(2, 132, 199, 0.15);
-      --radius: 24px;
+      --primary: #1769aa;
+      --secondary: #0e9f8a;
+      --border: #dce5ef;
+      --soft: #eaf3fb;
+      --danger: #d9485f;
     }
 
     body.dark {
-      --bg: linear-gradient(135deg, #0f172a 0%, #090d16 100%);
-      --surface: rgba(30, 41, 59, 0.95);
-      --surface-2: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-dark: #0ea5e9;
-      --secondary: #2dd4bf;
-      --accent: #fbbf24;
-      --border: #334155;
-      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      --bg: #101827;
+      --card: #1b2738;
+      --text: #edf4ff;
+      --muted: #b0bfd3;
+      --primary: #65b5ff;
+      --secondary: #48d6bd;
+      --border: #344359;
+      --soft: #26374b;
+      --danger: #ff8293;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Cairo", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.8; transition: all 0.3s ease; padding: 20px; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      transition: background .2s, color .2s;
+    }
 
     button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; border: none; background: none; }
 
-    .container { max-width: 950px; margin: auto; }
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 15px;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
 
-    /* شاشة تسجيل الدخول السحابية */
-    #authScreen {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 85vh; text-align: center;
-    }
-    .auth-card {
-      background: var(--surface); backdrop-filter: blur(10px); border: 1px solid var(--border); padding: 45px 30px;
-      border-radius: var(--radius); box-shadow: var(--shadow); max-width: 480px; width: 100%;
-      animation: fadeIn 0.6s ease-in-out;
-    }
-    .auth-card h2 { color: var(--primary); font-weight: 900; margin-bottom: 10px; font-size: 26px; }
-    .auth-card p { color: var(--muted); font-size: 14px; margin-bottom: 25px; }
-    .auth-input {
-      width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 14px;
-      background: var(--surface-2); color: var(--text); margin-bottom: 15px; outline: none; font-size: 15px; text-align: center; transition: 0.3s;
-    }
-    .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
-
-    /* الهيدر البهي والبهيج */
-    header {
-      background: linear-gradient(135deg, #0284c7, #0d9488);
-      color: white; padding: 30px; border-radius: var(--radius);
-      text-align: center; margin-bottom: 25px; box-shadow: var(--shadow);
-      position: relative; overflow: hidden;
-    }
-    header h1 { font-size: 26px; font-weight: 900; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    header p { font-size: 13px; opacity: 0.95; }
-
-    .theme-toggle {
-      position: absolute; left: 20px; top: 25px;
-      background: rgba(255, 255, 255, 0.25); border: none; color: white;
-      padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s;
-      backdrop-filter: blur(5px);
-    }
-    .theme-toggle:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
-
-    .user-info-badge {
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(0, 0, 0, 0.15); padding: 10px 18px; border-radius: 14px;
-      margin-top: 15px; font-size: 13px; backdrop-filter: blur(5px); flex-wrap: wrap; gap: 10px;
-    }
-    .logout-btn { background: #ef4444; color: white; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .logout-btn:hover { background: #dc2626; }
-
-    /* البطاقة الكبرى والتبويبات */
-    .master-card {
-      background: var(--surface); backdrop-filter: blur(10px);
+    button.secondary {
+      background: var(--soft);
+      color: var(--text);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      animation: fadeIn 0.4s ease-in-out;
     }
 
-    .tabs-header {
-      display: flex; background: var(--surface-2);
-      padding: 12px 12px 0 12px; gap: 8px; border-bottom: 1px solid var(--border);
+    button.danger { background: var(--danger); }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      margin: 5px 0 12px;
+    }
+
+    label { font-weight: bold; }
+
+    .container {
+      width: min(1100px, 94%);
+      margin: auto;
+    }
+
+    header {
+      background: linear-gradient(120deg, #104d82, #128c91);
+      color: white;
+      padding: 25px 0;
+    }
+
+    header h1 { margin: 0; font-size: 27px; }
+    header p { margin: 6px 0 15px; opacity: .92; }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
       flex-wrap: wrap;
     }
-    .tab-btn {
-      background: transparent; border: none; padding: 14px 20px;
-      border-radius: 12px 12px 0 0; cursor: pointer; font-weight: 700;
-      font-size: 13px; color: var(--muted); transition: all 0.3s;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .tab-btn:hover { color: var(--primary); background: rgba(2, 132, 199, 0.05); }
-    .tab-btn.active {
-      background: var(--surface); color: var(--primary);
-      border-top: 4px solid var(--primary); box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .section-content { padding: 30px; display: none; }
-    .section-content.active { display: block; animation: fadeIn 0.3s ease; }
-    .section-content h3 { color: var(--primary); margin-top: 0; font-size: 19px; font-weight: 900; margin-bottom: 20px; border-bottom: 2px solid var(--surface-2); padding-bottom: 12px; display: flex; align-items: center; gap: 10px; }
-
-    .form-group { margin-bottom: 18px; }
-    label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--text); }
-    input, select, textarea {
-      width: 100%; padding: 14px; border: 2px solid var(--border);
-      border-radius: 14px; background: var(--surface-2); color: var(--text);
-      outline: none; font-family: "Cairo", sans-serif; transition: 0.3s;
+    .header-actions button {
+      background: rgba(255,255,255,.17);
+      border: 1px solid rgba(255,255,255,.35);
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
 
-    .btn {
-      background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none;
-      padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif;
-      font-weight: 800; font-size: 14px; cursor: pointer; width: 100%; transition: all 0.3s;
-      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
+    nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 5;
     }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(2, 132, 199, 0.3); }
 
-    .result-box {
-      margin-top: 18px; padding: 18px; background: var(--surface-2);
-      border-radius: 14px; border-right: 5px solid var(--primary); font-size: 14px; line-height: 1.8;
+    nav button {
+      flex-shrink: 0;
+      background: var(--card);
+      color: var(--text);
       border: 1px solid var(--border);
     }
 
-    .progress-container { margin-top: 18px; background: var(--surface-2); border-radius: 12px; height: 20px; overflow: hidden; border: 2px solid var(--border); }
-    .progress-bar { background: linear-gradient(135deg, var(--secondary), var(--primary)); height: 100%; width: 0%; transition: width 0.5s ease; text-align: center; color: white; font-size: 11px; font-weight: bold; line-height: 18px; }
+    nav button.active {
+      background: var(--primary);
+      color: white;
+    }
 
-    .quiz-card { background: var(--surface-2); padding: 22px; border-radius: 16px; margin-top: 18px; border: 2px solid var(--border); }
-    .option-btn { display: block; width: 100%; text-align: right; background: var(--surface); border: 2px solid var(--border); padding: 14px 18px; border-radius: 12px; margin-bottom: 12px; font-weight: 700; color: var(--text); transition: 0.2s; cursor: pointer; }
-    .option-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateX(-5px); }
+    main { padding-bottom: 35px; }
 
-    /* جدول لوحة تحكم الأدمن */
-    .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-    .admin-table th, .admin-table td { border: 1px solid var(--border); padding: 10px; text-align: center; }
-    .admin-table th { background: var(--primary); color: white; }
+    .panel {
+      display: none;
+      animation: appear .2s ease;
+    }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+    .panel.active { display: block; }
+
+    @keyframes appear {
+      from { opacity: .4; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 5px 18px rgba(30,60,90,.04);
+      min-width: 0;
+    }
+
+    .card h3 { margin-top: 0; }
+
+    .muted { color: var(--muted); }
+
+    .stat {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .row > * { flex: 1; }
+
+    .progress {
+      height: 12px;
+      background: var(--soft);
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress div {
+      height: 100%;
+      width: 0;
+      background: var(--secondary);
+      transition: width .3s;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 9px 0;
+      background: var(--card);
+    }
+
+    .item.done { opacity: .7; }
+
+    .item.done .task-title {
+      text-decoration: line-through;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: var(--soft);
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .question {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+
+    .question label {
+      display: block;
+      font-weight: normal;
+      margin: 6px 0;
+    }
+
+    .question input {
+      width: auto;
+      margin: 0 7px 0 0;
+    }
+
+    .flashcard {
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--soft);
+      border-radius: 15px;
+      padding: 22px;
+      margin: 12px 0;
+    }
+
+    .flashcard .term {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .hidden { display: none !important; }
+
+    .notice {
+      background: var(--soft);
+      border-right: 4px solid var(--secondary);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 22px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    @media(max-width: 600px) {
+      header h1 { font-size: 22px; }
+      .card { padding: 14px; }
+      nav { margin-inline: -2%; padding-inline: 2%; }
     }
   </style>
 </head>
 <body>
-
-  <!-- شاشة الدخول السحابية -->
-  <div id="authScreen" class="container">
-    <div class="auth-card">
-      <div style="font-size: 55px; color: var(--primary); margin-bottom: 15px;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-      <h2>منصتك الطبية السحابية</h2>
-      <p>سجل اسمك وإيميلك لتبدأ المزامنة الفورية مع قاعدة البيانات السحابية.</p>
-      
-      <input type="text" id="inputName" class="auth-input" placeholder="اسمك الكريم (مثال: د. نادر)">
-      <input type="email" id="inputEmail" class="auth-input" placeholder="البريد الإلكتروني (student@gmail.com)">
-      
-      <button type="button" class="btn" id="authBtn">الدخول السحابي الموثق ✨</button>
+<header>
+  <div class="container header-row">
+    <div>
+      <h1 id="brandTitle">🩺 مساحتك الطبية</h1>
+      <p>Medical Study Hub — تعلّم بذكاء، ونظّم وقتك، وتقدّم كل يوم.</p>
+    </div>
+    <div class="header-actions">
+      <button id="langBtn" onclick="toggleLanguage()">English</button>
+      <button onclick="toggleTheme()">🌙 / ☀️</button>
     </div>
   </div>
+</header>
 
-  <!-- لوحة التحكم السحابية والبهيجة -->
-  <div id="appContent" class="container" style="display: none;">
-    <header>
-      <button type="button" class="theme-toggle" id="themeBtn">🌙 الوضع الليلي</button>
-      <h1>🩺 مساحتك الطبية السحابية</h1>
-      <p>مرتبطة مباشرة بقاعدة بيانات Supabase السحابية يا دكتور المستقبل</p>
-      
-      <div class="user-info-badge">
-        <span>👤 د. <b id="studentName">طالب طب</b> (<span id="studentEmail">...</span>) | 🏆 نقاطك السحابية: <b id="userPoints" style="color: var(--accent);">0</b> نقطة</span>
-        <button type="button" class="logout-btn" id="logoutBtn">تسجيل الخروج</button>
-      </div>
-    </header>
+<div class="container">
+  <nav id="navigation">
+    <button class="active" data-panel="home" onclick="showPanel('home',this)">الرئيسية</button>
+    <button data-panel="planner" onclick="showPanel('planner',this)">خطة الدراسة</button>
+    <button data-panel="progress" onclick="showPanel('progress',this)">التقدم</button>
+    <button data-panel="quiz" onclick="showPanel('quiz',this)">اختبارات</button>
+    <button data-panel="cards" onclick="showPanel('cards',this)">بطاقات المراجعة</button>
+    <button data-panel="terms" onclick="showPanel('terms',this)">المصطلحات الطبية</button>
+    <button data-panel="timer" onclick="showPanel('timer',this)">مؤقت التركيز</button>
+  </nav>
 
-    <div class="master-card">
-      <div class="tabs-header" id="tabsHeader">
-        <button type="button" class="tab-btn active" onclick="switchTab(event, 'planner')"><i class="fa-solid fa-calendar-days"></i> تخطيط الوقت</button>
-        <button type="button" class="tab-btn" onclick="switchTab(event, 'progress')"><i class="fa-solid fa-chart-line"></i> تتبع التقدم</button>
-        <button type="button" class="tab-btn" onclick="switchTab(event, 'quiz')"><i class="fa-solid fa-file-lines"></i> اختبارات ونقاط</button>
-        <button type="button" class="tab-btn" onclick="switchTab(event, 'ai')"><i class="fa-solid fa-robot"></i> المساعد الذكي</button>
-        <!-- تبويب الأدمن يظهر فقط للأدمن تلقائياً -->
-        <button type="button" id="adminTabBtn" class="tab-btn" style="display:none; color: #ef4444;" onclick="switchTab(event, 'adminPanel')"><i class="fa-solid fa-user-shield"></i> لوحة تحكم الأدمن 🛡️</button>
-      </div>
-
-      <!-- 1. تخطيط الوقت -->
-      <div id="planner" class="section-content active">
-        <h3><i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i> جدول تنظيم الوقت والمحاضرات</h3>
-        <div class="form-group">
-          <label>اسم المادة الطبية:</label>
-          <input type="text" id="subjectName" placeholder="مثال: علم الأدوية السريري - Pharmacology">
+  <main>
+    <section id="home" class="panel active">
+      <div class="card">
+        <h2 id="welcomeTitle">أهلًا بك في مساحتك الطبية 👋</h2>
+        <p id="welcomeText">مساحة تساعدك على تنظيم دراسة الطب، متابعة إنجازك، ومراجعة المفاهيم الطبية.</p>
+        <div class="notice">
+          بيانات هذه النسخة تُحفظ محليًا على هذا المتصفح. لا يوجد تسجيل دخول أو مزامنة بين الأجهزة في هذه النسخة.
         </div>
-        <div class="form-group">
-          <label>عدد المحاضرات الكلي:</label>
-          <input type="number" id="totalLecs" value="24" min="1">
-        </div>
-        <div class="form-group">
-          <label>متوسط مدة المحاضرة (بالدقائق):</label>
-          <input type="number" id="lecMins" value="50" min="10">
-        </div>
-        <button type="button" class="btn" onclick="calculatePlan()">توليد الخطة الدراسية الذكية 📊</button>
-        <div class="result-box" id="planResult" style="display: none;"></div>
       </div>
 
-      <!-- 2. تتبع التقدم -->
-      <div id="progress" class="section-content">
-        <h3><i class="fa-solid fa-chart-pie" style="color: var(--primary);"></i> شريط تتبع إنجاز المادة والـ Streak اليومي</h3>
-        <div class="form-group">
-          <label>كم محاضرة أنجزت حتى الآن بحمد الله؟</label>
-          <input type="number" id="completedLecs" value="6" min="0" oninput="updateProgress()">
+      <div class="grid">
+        <div class="card">
+          <div>📚 المهام الدراسية</div>
+          <div class="stat" id="totalTasks">0</div>
+          <div class="muted">إجمالي المهام</div>
         </div>
-        <label>نسبة الإنجاز الكلية للمادة:</label>
-        <div class="progress-container">
-          <div id="progressBar" class="progress-bar">0%</div>
+        <div class="card">
+          <div>✅ المهام المكتملة</div>
+          <div class="stat" id="completedTasks">0</div>
+          <div class="muted">إنجازك حتى الآن</div>
         </div>
-        <div class="result-box" id="streakMsg" style="margin-top: 18px;">🔥 عظمة على عظمة يا دكتور المستقبل! الانتظام اليومي يمهد لك طريق التميز والأول على الدفعة.</div>
+        <div class="card">
+          <div>📈 نسبة الإنجاز</div>
+          <div class="stat" id="completionRate">0%</div>
+          <div class="progress"><div id="homeProgress"></div></div>
+        </div>
       </div>
 
-      <!-- 3. اختبارات ونقاط -->
-      <div id="quiz" class="section-content">
-        <h3><i class="fa-solid fa-award" style="color: var(--primary);"></i> اختبار قياس الفهم (تحديث النقاط سحابياً)</h3>
-        <div class="form-group">
-          <label>الصق نص أو ملخص المحاضرة الطبية هنا:</label>
-          <textarea id="lectureText" rows="5" placeholder="الصق النص here ليقوم محرك التقييم بتحليله وتوليد الأسئلة..."></textarea>
-        </div>
-        <button type="button" class="btn" style="background: linear-gradient(135deg, var(--secondary), var(--accent));" onclick="generateInteractiveQuiz()">بدء الاختبار وكسب النقاط السحابية 🚀</button>
-        
-        <div id="quizContainer" style="display: none;"></div>
-        <div class="result-box" id="finalQuizRes" style="display: none;"></div>
+      <div class="card">
+        <h3>⚡ إضافة مهمة سريعة</h3>
+        <form id="quickTaskForm">
+          <label for="quickTitle">عنوان المهمة</label>
+          <input id="quickTitle" required placeholder="مثال: مراجعة محاضرة الفسيولوجيا">
+          <div class="row">
+            <div>
+              <label for="quickSubject">المادة</label>
+              <select id="quickSubject">
+                <option>علم التشريح</option>
+                <option>علم وظائف الأعضاء</option>
+                <option>علم الأجنة</option>
+                <option>علم الأنسجة</option>
+                <option>الكيمياء الحيوية</option>
+                <option>علم الأدوية</option>
+                <option>علم الأمراض</option>
+                <option>أخرى</option>
+              </select>
+            </div>
+            <div>
+              <label for="quickMinutes">المدة بالدقائق</label>
+              <input id="quickMinutes" type="number" min="1" value="30" required>
+            </div>
+          </div>
+          <button type="submit">إضافة المهمة</button>
+        </form>
       </div>
 
-      <!-- 4. المساعد الذكي -->
-      <div id="ai" class="section-content">
-        <h3><i class="fa-solid fa-brain" style="color: var(--primary);"></i> المساعد الطبي الذكي (عربي / English)</h3>
-        <div class="form-group">
-          <label>اسأل عن أي مصطلح أو آلية مرضية:</label>
-          <input type="text" id="aiQuery" placeholder="مثال: Insulin / Molecular / Pathophysiology">
-        </div>
-        <button type="button" class="btn" style="background: linear-gradient(135deg, #4f46e5, var(--primary));" onclick="askAI()">طلب تبسيط وشرح سريري 💡</button>
-        <div class="result-box" id="aiBox" style="display: none;"></div>
+      <div class="card">
+        <h3>📌 مهامك القادمة</h3>
+        <div id="homeTasks"></div>
+      </div>
+    </section>
+
+    <section id="planner" class="panel">
+      <div class="card">
+        <h2>📅 خطة الدراسة</h2>
+        <p class="muted">أضف محاضراتك ومهامك وحدد وقتًا واقعيًا لكل مهمة.</p>
+        <form id="taskForm">
+          <label for="taskTitle">عنوان المحاضرة أو المهمة</label>
+          <input id="taskTitle" required placeholder="مثال: Cell membrane">
+
+          <div class="row">
+            <div>
+              <label for="taskSubject">المادة</label>
+              <select id="taskSubject">
+                <option>علم التشريح</option>
+                <option>علم وظائف الأعضاء</option>
+                <option>علم الأجنة</option>
+                <option>علم الأنسجة</option>
+                <option>الكيمياء الحيوية</option>
+                <option>علم الأدوية</option>
+                <option>علم الأمراض</option>
+                <option>التغذية</option>
+                <option>الأحياء الجزيئية</option>
+                <option>الصحة العامة</option>
+                <option>أخرى</option>
+              </select>
+            </div>
+            <div>
+              <label for="taskMinutes">المدة بالدقائق</label>
+              <input id="taskMinutes" type="number" min="1" value="45" required>
+            </div>
+          </div>
+
+          <label for="taskDate">موعد المهمة</label>
+          <input id="taskDate" type="date">
+          <button type="submit">➕ إضافة للخطة</button>
+        </form>
       </div>
 
-      <!-- 5. لوحة تحكم الأدمن السحابية -->
-      <div id="adminPanel" class="section-content">
-        <h3><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> لوحة تحكم الأدمن (إدارة جميع الطلاب سحابياً)</h3>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 15px;">هنا يمكنك الاطلاع على جميع الطلاب المسجلين في المنصة ونقاطهم الحية:</p>
-        <button type="button" class="btn" style="background: #0284c7; margin-bottom: 15px;" onclick="loadAllStudents()">تحديث وتنزيل بيانات الطلاب 🔄</button>
-        <div id="adminTableContainer" style="overflow-x: auto;"></div>
+      <div class="card">
+        <div class="row">
+          <h3>قائمة المهام</h3>
+          <select id="taskFilter" onchange="renderTasks()">
+            <option value="all">كل المهام</option>
+            <option value="pending">غير المكتملة</option>
+            <option value="done">المكتملة</option>
+          </select>
+        </div>
+        <div id="taskList"></div>
       </div>
-    </div>
+    </section>
+
+    <section id="progress" class="panel">
+      <div class="card">
+        <h2>📊 متابعة التقدم</h2>
+        <p>تابع إنجاز مهامك الدراسية في هذا المتصفح.</p>
+        <div class="progress"><div id="progressBar"></div></div>
+        <h3 id="progressSummary">لم تبدأ بعد — أضف أول مهمة لك!</h3>
+        <div class="grid">
+          <div class="card">
+            <div class="muted">إجمالي وقت المهام</div>
+            <div class="stat" id="totalMinutes">0</div>
+            <small>دقيقة</small>
+          </div>
+          <div class="card">
+            <div class="muted">وقت المهام المكتملة</div>
+            <div class="stat" id="doneMinutes">0</div>
+            <small>دقيقة</small>
+          </div>
+          <div class="card">
+            <div class="muted">نتائج الاختبارات</div>
+            <div class="stat" id="quizAverage">—</div>
+            <small>متوسط النسب المسجلة</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>سجل الاختبارات</h3>
+        <div id="quizHistory"></div>
+      </div>
+
+      <div class="card">
+        <h3>إدارة بياناتك</h3>
+        <p class="muted">يمكنك تنزيل نسخة احتياطية من بيانات هذا المتصفح.</p>
+        <button onclick="exportData()">تنزيل نسخة احتياطية</button>
+        <button class="secondary" onclick="document.getElementById('importFile').click()">استعادة نسخة</button>
+        <input id="importFile" class="hidden" type="file" accept=".json,application/json">
+        <button class="danger" onclick="resetData()">مسح جميع البيانات المحلية</button>
+      </div>
+    </section>
+
+    <section id="quiz" class="panel">
+      <div class="card">
+        <h2>📝 اختبار طبي قصير</h2>
+        <p class="muted">اختر إجابة واحدة لكل سؤال، ثم اضغط على تصحيح الاختبار.</p>
+        <form id="quizForm">
+          <div id="quizQuestions"></div>
+          <button type="submit">تصحيح الاختبار</button>
+        </form>
+        <div id="quizResult" class="notice hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="cards" class="panel">
+      <div class="card">
+        <h2>🧠 بطاقات المراجعة</h2>
+        <p class="muted">حاول الإجابة بنفسك قبل إظهار الإجابة.</p>
+        <div class="flashcard">
+          <div id="flashTerm" class="term"></div>
+          <p id="flashAnswer" class="hidden"></p>
+        </div>
+        <div class="row">
+          <button onclick="revealCard()">إظهار الإجابة</button>
+          <button class="secondary" onclick="nextCard()">البطاقة التالية ←</button>
+        </div>
+        <p id="cardCounter" class="muted"></p>
+      </div>
+
+      <div class="card">
+        <h3>➕ إضافة بطاقة من عندك</h3>
+        <form id="cardForm">
+          <label for="newCardTerm">المصطلح أو السؤال</label>
+          <input id="newCardTerm" required>
+          <label for="newCardAnswer">الإجابة أو التعريف</label>
+          <textarea id="newCardAnswer" rows="3" required></textarea>
+          <button type="submit">إضافة البطاقة</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="terms" class="panel">
+      <div class="card">
+        <h2>🩺 قاموس المصطلحات الطبية</h2>
+        <p class="muted">ابحث عن مصطلح بالإنجليزية أو العربية.</p>
+        <input id="termSearch" placeholder="ابحث مثل: Homeostasis أو الاتزان الداخلي" oninput="renderTerms()">
+        <div id="termsList"></div>
+      </div>
+
+      <div class="card">
+        <h3>➕ إضافة مصطلح</h3>
+        <form id="termForm">
+          <label for="termEn">المصطلح بالإنجليزية</label>
+          <input id="termEn" required>
+          <label for="termAr">المعنى بالعربية</label>
+          <input id="termAr" required>
+          <label for="termExplanation">شرح مختصر</label>
+          <textarea id="termExplanation" rows="3" required></textarea>
+          <button type="submit">إضافة المصطلح</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="timer" class="panel">
+      <div class="card" style="text-align:center">
+        <h2>⏱️ مؤقت التركيز</h2>
+        <p class="muted">اختر مدة تركيز مناسبة، وابتعد عن المشتتات أثناء الجلسة.</p>
+        <div class="row">
+          <div>
+            <label for="focusMinutes">مدة التركيز بالدقائق</label>
+            <input id="focusMinutes" type="number" min="1" max="180" value="25">
+          </div>
+          <div>
+            <label for="breakMinutes">مدة الاستراحة بالدقائق</label>
+            <input id="breakMinutes" type="number" min="1" max="60" value="5">
+          </div>
+        </div>
+        <div id="timerDisplay" class="stat" style="font-size:48px;margin:20px">25:00</div>
+        <div class="row">
+          <button id="timerStart" onclick="startTimer()">ابدأ</button>
+          <button class="secondary" onclick="pauseTimer()">إيقاف مؤقت</button>
+          <button class="secondary" onclick="resetTimer()">إعادة ضبط</button>
+        </div>
+        <p id="timerStatus" aria-live="polite">جاهز للتركيز؟</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="container">
+    <strong>مساحتك الطبية | Medical Study Hub</strong>
+    <p>منصة مساعدة للدراسة والتنظيم — وليست بديلًا عن المراجع الطبية المعتمدة.</p>
+    <small>هذه النسخة تحفظ البيانات محليًا على المتصفح فقط.</small>
   </div>
+</footer>
 
-  <script>
-    // 🔗 ربط Supabase بالمفاتيح الخاصة بمشروعك السحابي
-    const SUPABASE_URL = 'https://klyklffwqfltpdeztqev.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtseWtsZmZ3cWZsdHBkZXp0cWV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyOTc1NjYsImV4cCI6MjEwNzg3MzU2Nn0.ovY6K7vMic_0CGahIvCZHvJilLQFso41dubo4SswsEA'; 
-    
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+"use strict";
 
-    // إيميلك الشخصي كأدمن
-    const ADMIN_EMAIL = 'nadrmadalmsry196@gmail.com';
+const STORAGE_KEY = "medicalStudyHub_v1";
 
-    document.addEventListener("DOMContentLoaded", function() {
-      const savedEmail = localStorage.getItem('bhia_medical_email');
-      const savedName = localStorage.getItem('bhia_medical_name');
-      if (savedEmail) {
-        showApp(savedName, savedEmail);
-      }
+const defaultData = {
+  tasks: [],
+  quizHistory: [],
+  cards: [
+    {term:"Homeostasis", answer:"الاتزان الداخلي: قدرة الجسم على الحفاظ على بيئة داخلية مستقرة رغم التغيرات الخارجية."},
+    {term:"Mitochondria", answer:"الميتوكوندريا: عضيات خلوية تشارك في إنتاج ATP عبر التنفس الخلوي."},
+    {term:"Osmosis", answer:"التناضح: حركة الماء عبر غشاء شبه منفذ نحو الجهة ذات التركيز الأعلى للمواد المذابة غير النافذة."},
+    {term:"Apoptosis", answer:"الاستماتة: موت خلوي مبرمج ومنظم يساهم في نمو الأنسجة والمحافظة عليها."},
+    {term:"Hemostasis", answer:"الإرقاء: العمليات التي توقف النزيف، وتشمل تضيق الأوعية وتكوين السدادة الصفائحية والتخثر."},
+    {term:"Negative feedback", answer:"التغذية الراجعة السلبية: استجابة تقلل التغير الأصلي وتساعد على إعادة المتغير نحو نطاقه الطبيعي."}
+  ],
+  terms: [
+    {en:"Anatomy", ar:"علم التشريح", explanation:"دراسة بنية الجسم وأجزائه والعلاقات المكانية بينها."},
+    {en:"Physiology", ar:"علم وظائف الأعضاء", explanation:"دراسة كيفية عمل الخلايا والأنسجة والأعضاء وأجهزة الجسم."},
+    {en:"Histology", ar:"علم الأنسجة", explanation:"دراسة الأنسجة وتركيبها المجهري."},
+    {en:"Embryology", ar:"علم الأجنة", explanation:"دراسة نمو الكائن الحي قبل الولادة، من الإخصاب إلى المراحل اللاحقة من التطور."},
+    {en:"Pathology", ar:"علم الأمراض", explanation:"دراسة أسباب الأمراض وآليات حدوثها والتغيرات التي تحدثها في الخلايا والأنسجة."},
+    {en:"Pharmacology", ar:"علم الأدوية", explanation:"دراسة تأثير الأدوية في الأنظمة الحيوية وآليات عملها واستخداماتها وآثارها الضارة."},
+    {en:"Metabolism", ar:"الأيض أو الاستقلاب", explanation:"مجموع التفاعلات الكيميائية التي تحدث في الجسم، ويشمل البناء والهدم."},
+    {en:"Homeostasis", ar:"الاتزان الداخلي", explanation:"تنظيم البيئة الداخلية للجسم والمحافظة على المتغيرات الحيوية ضمن نطاقات مناسبة."},
+    {en:"Osmosis", ar:"التناضح", explanation:"انتقال الماء عبر غشاء شبه منفذ استجابة لاختلاف الجهد المائي."},
+    {en:"Diffusion", ar:"الانتشار", explanation:"حركة الجزيئات من منطقة ذات تركيز أعلى إلى منطقة ذات تركيز أقل."},
+    {en:"Inflammation", ar:"الالتهاب", explanation:"استجابة نسيجية للأذى أو العدوى، وقد تتضمن الاحمرار والحرارة والتورم والألم."},
+    {en:"Anemia", ar:"فقر الدم", explanation:"انخفاض تركيز الهيموغلوبين أو كتلة كريات الدم الحمراء بما يقلل قدرة الدم على نقل الأكسجين."},
+    {en:"Hemostasis", ar:"الإرقاء", explanation:"مجموعة آليات توقف النزيف وتحافظ على سلامة الأوعية الدموية."},
+    {en:"Apoptosis", ar:"الاستماتة", explanation:"عملية موت خلوي مبرمج ومنظم تختلف عن النخر."},
+    {en:"ATP", ar:"أدينوسين ثلاثي الفوسفات", explanation:"جزيء ينقل الطاقة القابلة للاستخدام في كثير من العمليات الخلوية."}
+  ]
+};
 
-      document.getElementById('authBtn').addEventListener('click', async function() {
-        const nameVal = document.getElementById('inputName').value.trim();
-        const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
+let data = loadData();
+let cardIndex = 0;
+let timerRemaining = 25 * 60;
+let timerInterval = null;
+let timerMode = "focus";
+let englishMode = false;
 
-        if (!nameVal || !emailVal || !emailVal.includes('@')) {
-          alert("الرجاء إدخال الاسم وبريد إلكتروني صحيح لتبدأ رحلتك!");
-          return;
-        }
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(defaultData);
+    const parsed = JSON.parse(raw);
+    return {
+      ...structuredClone(defaultData),
+      ...parsed,
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
+      quizHistory: Array.isArray(parsed.quizHistory) ? parsed.quizHistory : [],
+      cards: Array.isArray(parsed.cards) ? parsed.cards : structuredClone(defaultData.cards),
+      terms: Array.isArray(parsed.terms) ? parsed.terms : structuredClone(defaultData.terms)
+    };
+  } catch (e) {
+    return structuredClone(defaultData);
+  }
+}
 
-        // فحص وإنشاء الطالب في جدول Supabase سحابياً
-        const { data, error } = await supabaseClient
-          .from('students')
-          .select('*')
-          .eq('email', emailVal)
-          .single();
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    updateDashboard();
+  } catch (e) {
+    alert("تعذر حفظ البيانات في المتصفح. تأكد من توفر مساحة تخزين.");
+  }
+}
 
-        let isAdmin = (emailVal === ADMIN_EMAIL);
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
 
-        if (!data) {
-          // تسجيل طالب جديد في قاعدة البيانات
-          await supabaseClient.from('students').insert([
-            { email: emailVal, full_name: nameVal, points: 0, is_admin: isAdmin }
-          ]);
-        }
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[ch]));
+}
 
-        localStorage.setItem('bhia_medical_email', emailVal);
-        localStorage.setItem('bhia_medical_name', nameVal);
-        showApp(nameVal, emailVal);
-      });
-
-      document.getElementById('logoutBtn').addEventListener('click', function() {
-        localStorage.removeItem('bhia_medical_email');
-        localStorage.removeItem('bhia_medical_name');
-        document.getElementById('appContent').style.display = 'none';
-        document.getElementById('authScreen').style.display = 'flex';
-      });
-
-      document.getElementById('themeBtn').addEventListener('click', function() {
-        document.body.classList.toggle('dark');
-        const isDark = document.body.classList.contains('dark');
-        this.innerHTML = isDark ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي';
-      });
-      
-      updateProgress();
-    });
-
-    async function showApp(name, email) {
-      document.getElementById('authScreen').style.display = 'none';
-      document.getElementById('appContent').style.display = 'block';
-      document.getElementById('studentName').innerText = name;
-      document.getElementById('studentEmail').innerText = email;
-
-      // جلب النقاط الحية من Supabase
-      const { data } = await supabaseClient
-        .from('students')
-        .select('points, is_admin')
-        .eq('email', email)
-        .single();
-
-      let currentPoints = data ? data.points : 0;
-      document.getElementById('userPoints').innerText = currentPoints;
-
-      // إظهار زر لوحة تحكم الأدمن إذا كان هو الأدمن
-      if (email === ADMIN_EMAIL || (data && data.is_admin)) {
-        document.getElementById('adminTabBtn').style.display = 'inline-flex';
-      }
-    }
-
-    async function addPointsToCloud(pts) {
-      const email = localStorage.getItem('bhia_medical_email');
-      if (!email) return;
-
-      const { data } = await supabaseClient
-        .from('students')
-        .select('points')
-        .eq('email', email)
-        .single();
-
-      let newPoints = (data ? data.points : 0) + pts;
-
-      await supabaseClient
-        .from('students')
-        .update({ points: newPoints })
-        .eq('email', email);
-
-      document.getElementById('userPoints').innerText = newPoints;
-    }
-
-    function switchTab(evt, sectionId) {
-      document.querySelectorAll('.section-content').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(sectionId).classList.add('active');
-      evt.currentTarget.classList.add('active');
-      if(sectionId === 'adminPanel') {
-        loadAllStudents();
-      }
-    }
-
-    async function loadAllStudents() {
-      const container = document.getElementById('adminTableContainer');
-      container.innerHTML = "جاري تحميل بيانات جميع الطلاب من السحابة... ⏳";
-
-      const { data, error } = await supabaseClient
-        .from('students')
-        .select('*')
-        .order('points', { ascending: false });
-
-      if (error || !data) {
-        container.innerHTML = "حدث خطأ أثناء جلب البيانات.";
-        return;
-      }
-
-      let html = `<table class="admin-table">
-        <tr>
-          <th>اسم الطالب</th>
-          <th>البريد الإلكتروني</th>
-          <th>النقاط السحابية</th>
-          <th>صلاحية الأدمن</th>
-        </tr>`;
-
-      data.forEach(st => {
-        html += `<tr>
-          <td><b>${st.full_name}</b></td>
-          <td>${st.email}</td>
-          <td><span style="color:var(--accent); font-weight:bold;">${st.points}</span></td>
-          <td>${st.is_admin ? '🛡️ أدمن' : 'طالب'}</td>
-        </tr>`;
-      });
-      html += `</table>`;
-      container.innerHTML = html;
-    }
-
-    function calculatePlan() {
-      const name = document.getElementById('subjectName').value || 'المادة الطبية';
-      const total = parseInt(document.getElementById('totalLecs').value) || 24;
-      const mins = parseInt(document.getElementById('lecMins').
+function showPanel(id, button) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  docume
